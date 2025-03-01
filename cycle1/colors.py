@@ -1,0 +1,19 @@
+"""Color variables for Pygame."""
+
+#Colors
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 170)
+GREEN = (0, 170, 0)
+CYAN = (0, 170, 170)
+RED = (170, 0, 0)
+MAGENTA = (170, 0, 170)
+BROWN = (170, 85, 0)
+LIGHT_GRAY = (170, 170, 170)
+DARK_GRAY = (85, 85, 85)
+LIGHT_BLUE = (85, 85, 255)
+LIGHT_GREEN = (85, 255, 85)
+LIGHT_CYAN = (85, 255, 255)
+LIGHT_RED = (255, 85, 85)
+LIGHT_MAGENTA = (255, 85, 255)
+YELLOW = (255, 255, 85)
+WHITE = (255, 255, 255)
