@@ -136,24 +136,6 @@ def logoScreen():
     screen.goto_xy(28,2)
     screen.write('Apogee Software Presents')
     
-    # logo
-    screen.set_text_color(RED)
-    screen.set_text_background(BLACK)
-    screen.goto_xy(1, 5)
-    screen.write('     ÛÛÛ     ÛÛÛ     ÛÛÛÛÛÛÛÛÛÛ         ÛÛÛÛÛÛÛÛÛÛÛ        ÛÛÛÛÛÛÛÛÛÛÛÛÛ  (R)')
-    screen.write('     ÛÛÛ±±  ÛÛÛ±±±   ÛÛÛ±±±±±ÛÛÛ±      ÛÛÛ±±±±±±±ÛÛÛ±        ±±±±±±ÛÛÛÛ±±±')
-    screen.write('     ÛÛÛ±± ÛÛÛ±±±    ÛÛÛ±±   ÛÛÛ±±     ÛÛÛ±±     ÛÛÛ±±            ÛÛÛ±±±±')
-    screen.write('     ÛÛÛ±±ÛÛÛ±±±     ÛÛÛ±±   ÛÛÛ±±    ÛÛÛ±±±      ÛÛÛ±           ÛÛÛ±±±')
-    screen.write('     ÛÛÛ±ÛÛÛ±±±      ÛÛÛÛÛÛÛÛÛÛ±±±    ÛÛÛ±±       ÛÛÛ±±         ÛÛÛ±±±')
-    screen.write('     ÛÛÛÛÛÛ±±±       ÛÛÛ±±ÛÛÛ±±±±     ÛÛÛ±±       ÛÛÛ±±        ÛÛÛ±±±')
-    screen.write('     ÛÛÛ±ÛÛÛ±        ÛÛÛ±± ÛÛÛ±        ÛÛÛ±      ÛÛÛ±±±       ÛÛÛ±±±')
-    screen.write('     ÛÛÛ±±ÛÛÛ±       ÛÛÛ±±  ÛÛÛ±       ÛÛÛ±±     ÛÛÛ±±      ÛÛÛÛ±±±')
-    screen.write('     ÛÛÛ±± ÛÛÛ±      ÛÛÛ±±   ÛÛÛ±       ÛÛÛÛÛÛÛÛÛÛÛ±±±     ÛÛÛÛÛÛÛÛÛÛÛÛÛ')
-    screen.write('     ÛÛÛ±±  ÛÛÛ±       ±±±     ±±±        ±±±±±±±±±±±        ±±±±±±±±±±±±±')
-    screen.write('     ÛÛÛ±±   ÛÛÛ±');       
-    screen.write('     ÛÛÛ±±    ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ')
-    screen.write('       ±±±      ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±')
-    
     screen.set_text_color(YELLOW)
     screen.set_text_background(BLACK)
     screen.goto_xy(10, 19)    
@@ -162,15 +144,66 @@ def logoScreen():
     screen.goto_xy(24, 21)
     screen.write("Copyright (C) 1990 Scott Miller")
     
+    screen.goto_xy(12, 23)
+    screen.write("User-Supported Software -- $7.50 Registration Fee Required")
+
+    screen.set_text_color(LIGHT_CYAN)
+    screen.goto_xy(27,24)
+    screen.write("Press any key to continue.")
     
+    # logo and variables
+    rainbow = [BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE, BROWN, LIGHT_GRAY, DARK_GRAY, LIGHT_BLUE, LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_MAGENTA]
+    colorIndex = 0
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type ==pygame.KEYDOWN:
+                running = False
+
+        screen.set_text_color(rainbow[colorIndex])
+        screen.set_text_background(BLACK)
+        screen.goto_xy(1, 5)
+        screen.write('     ÛÛÛ     ÛÛÛ     ÛÛÛÛÛÛÛÛÛÛ         ÛÛÛÛÛÛÛÛÛÛÛ        ÛÛÛÛÛÛÛÛÛÛÛÛÛ  (R)')
+        screen.write('     ÛÛÛ±±  ÛÛÛ±±±   ÛÛÛ±±±±±ÛÛÛ±      ÛÛÛ±±±±±±±ÛÛÛ±        ±±±±±±ÛÛÛÛ±±±')
+        screen.write('     ÛÛÛ±± ÛÛÛ±±±    ÛÛÛ±±   ÛÛÛ±±     ÛÛÛ±±     ÛÛÛ±±            ÛÛÛ±±±±')
+        screen.write('     ÛÛÛ±±ÛÛÛ±±±     ÛÛÛ±±   ÛÛÛ±±    ÛÛÛ±±±      ÛÛÛ±           ÛÛÛ±±±')
+        screen.write('     ÛÛÛ±ÛÛÛ±±±      ÛÛÛÛÛÛÛÛÛÛ±±±    ÛÛÛ±±       ÛÛÛ±±         ÛÛÛ±±±')
+        screen.write('     ÛÛÛÛÛÛ±±±       ÛÛÛ±±ÛÛÛ±±±±     ÛÛÛ±±       ÛÛÛ±±        ÛÛÛ±±±')
+        screen.write('     ÛÛÛ±ÛÛÛ±        ÛÛÛ±± ÛÛÛ±        ÛÛÛ±      ÛÛÛ±±±       ÛÛÛ±±±')
+        screen.write('     ÛÛÛ±±ÛÛÛ±       ÛÛÛ±±  ÛÛÛ±       ÛÛÛ±±     ÛÛÛ±±      ÛÛÛÛ±±±')
+        screen.write('     ÛÛÛ±± ÛÛÛ±      ÛÛÛ±±   ÛÛÛ±       ÛÛÛÛÛÛÛÛÛÛÛ±±±     ÛÛÛÛÛÛÛÛÛÛÛÛÛ')
+        screen.write('     ÛÛÛ±±  ÛÛÛ±       ±±±     ±±±        ±±±±±±±±±±±        ±±±±±±±±±±±±±')
+        screen.write('     ÛÛÛ±±   ÛÛÛ±');       
+        screen.write('     ÛÛÛ±±    ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ')
+        screen.write('       ±±±      ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±')
+
+        pygame.display.update()
+        pygame.time.delay(300)
+
+        colorIndex = (colorIndex + 1) % len(rainbow)
+
+def difficultyScreen():
+    window.fill(BLUE)
+
+    screen.set_text_color(BLUE)
+    screen.set_text_background(RED)
+    screen.goto_xy(25, 5)
+    screen.write("An Apogee Software Production")
     
+    pygame.display.update()
+
 # Program
 def main():
     
     # Calls menu screens
     #systemColor = colorScreen()
     #systemSpeed = speedScreen(systemColor) 
-    logoScreen()
+    #logoScreen()
+    difficultyScreen()
 
     pygame.display.update()
     pygame.time.delay(2000)
