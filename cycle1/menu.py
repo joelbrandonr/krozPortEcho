@@ -15,25 +15,166 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("KINGDOM OF KROZ 2")
 screen = Screen()
 
-# Menu functions
-def draw_menu():
+# Color menu
+def colorScreen():
     screen.set_text_color(BLUE)
+    screen.set_text_background(BLACK)
     screen.goto_xy(31, 2)
     screen.write("KINGDOM OF KROZ 2")
     
+    screen.set_text_color(WHITE)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(18, 10)
+    screen.write("Is your screen Color or Monochrome (C/M)? ") 
+    
     pygame.display.update()
+    
+    # Input stuff
+    input_received = False
+    blink = True
+    systemColor = None
+    while not input_received:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                key = pygame.key.name(event.key)
+                if key in ('c', 'C'):
+                    systemColor = "color"
+                    input_received = True
+                elif key in ('m', 'M'):
+                    systemColor = "monochrome"
+                    input_received = True
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        
+        # Blink cursor
+        screen.goto_xy(60, 10)
+        if blink:
+            screen.write("C")
+        else:
+            screen.write(" ")
+        pygame.display.update()
+        pygame.time.delay(500)
+        blink = not blink
 
+    # Informs user of color choice (variable systemColor) before proceeding to next screen
+    screen.goto_xy(60, 10)
+    screen.write("C" if systemColor == "color" else "M")
+    pygame.display.update()
+    pygame.time.delay(100)
+
+    screen.clear_screen()
+    return systemColor
+
+# Speed menu
+def speedScreen(systemSpeed):
+    screen.set_text_color(BLUE)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(31, 2)
+    screen.write("KINGDOM OF KROZ 2")
+    
+    screen.set_text_color(WHITE)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(28, 14)
+    screen.write("Slow or Fast PC (S/F)? ") 
+    
+    screen.set_text_color(LIGHT_GRAY)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(9, 17)
+    screen.write("If you have an older PC (like an XT model) choose 'S' for Slow.") 
+    
+    screen.goto_xy(10, 19)
+    screen.write("If you have a PC AT, 80386 chip, etc., choose "F" for Fast.") 
+    
+    screen.goto_xy(32, 21)
+    screen.write("(Default = Slow)")
+    
+    pygame.display.update()
+    
+    # Input stuff
+    input_received = False
+    blink = True
+    systemColor = None
+    while not input_received:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                key = pygame.key.name(event.key)
+                if key in ('s', 'S'):
+                    systemSpeed = "slow"
+                    input_received = True
+                elif key in ('f', 'F'):
+                    systemSpeed = "fast"
+                    input_received = True
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        
+        # Blink cursor
+        screen.set_text_color(WHITE)
+        screen.set_text_background(BLACK)
+        screen.goto_xy(51, 14)
+        if blink:
+            screen.write("S")
+        else:
+            screen.write(" ")
+        pygame.display.update()
+        pygame.time.delay(500)
+        blink = not blink
+
+    # Informs user of color choice (variable systemSpeed) before proceeding to next screen
+    screen.goto_xy(51, 14)
+    screen.write("S" if systemSpeed == "slow" else "F")
+    pygame.display.update()
+    pygame.time.delay(100)
+
+    screen.clear_screen()
+    return systemSpeed
+
+def logoScreen():
+    screen.set_text_color(WHITE)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(28,2)
+    screen.write('Apogee Software Presents')
+    
+    # logo
+    screen.set_text_color(RED)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(1, 5)
+    screen.write('     ÛÛÛ     ÛÛÛ     ÛÛÛÛÛÛÛÛÛÛ         ÛÛÛÛÛÛÛÛÛÛÛ        ÛÛÛÛÛÛÛÛÛÛÛÛÛ  (R)')
+    screen.write('     ÛÛÛ±±  ÛÛÛ±±±   ÛÛÛ±±±±±ÛÛÛ±      ÛÛÛ±±±±±±±ÛÛÛ±        ±±±±±±ÛÛÛÛ±±±')
+    screen.write('     ÛÛÛ±± ÛÛÛ±±±    ÛÛÛ±±   ÛÛÛ±±     ÛÛÛ±±     ÛÛÛ±±            ÛÛÛ±±±±')
+    screen.write('     ÛÛÛ±±ÛÛÛ±±±     ÛÛÛ±±   ÛÛÛ±±    ÛÛÛ±±±      ÛÛÛ±           ÛÛÛ±±±')
+    screen.write('     ÛÛÛ±ÛÛÛ±±±      ÛÛÛÛÛÛÛÛÛÛ±±±    ÛÛÛ±±       ÛÛÛ±±         ÛÛÛ±±±')
+    screen.write('     ÛÛÛÛÛÛ±±±       ÛÛÛ±±ÛÛÛ±±±±     ÛÛÛ±±       ÛÛÛ±±        ÛÛÛ±±±')
+    screen.write('     ÛÛÛ±ÛÛÛ±        ÛÛÛ±± ÛÛÛ±        ÛÛÛ±      ÛÛÛ±±±       ÛÛÛ±±±')
+    screen.write('     ÛÛÛ±±ÛÛÛ±       ÛÛÛ±±  ÛÛÛ±       ÛÛÛ±±     ÛÛÛ±±      ÛÛÛÛ±±±')
+    screen.write('     ÛÛÛ±± ÛÛÛ±      ÛÛÛ±±   ÛÛÛ±       ÛÛÛÛÛÛÛÛÛÛÛ±±±     ÛÛÛÛÛÛÛÛÛÛÛÛÛ')
+    screen.write('     ÛÛÛ±±  ÛÛÛ±       ±±±     ±±±        ±±±±±±±±±±±        ±±±±±±±±±±±±±')
+    screen.write('     ÛÛÛ±±   ÛÛÛ±');       
+    screen.write('     ÛÛÛ±±    ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ')
+    screen.write('       ±±±      ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±')
+    
+    screen.set_text_color(YELLOW)
+    screen.set_text_background(BLACK)
+    screen.goto_xy(10, 19)    
+    screen.write("KINGDOM OF KROZ II -- UPDATED VOLUME THREE OF THE KROZ SERIES")
+
+    screen.goto_xy(24, 21)
+    screen.write("Copyright (C) 1990 Scott Miller")
+    
+    
+    
 # Program
 def main():
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                
-        draw_menu()
-        pygame.time.delay(100)
     
+    # Calls menu screens
+    #systemColor = colorScreen()
+    #systemSpeed = speedScreen(systemColor) 
+    logoScreen()
+
+    pygame.display.update()
+    pygame.time.delay(2000)
+
     pygame.quit()
     sys.exit()
 
