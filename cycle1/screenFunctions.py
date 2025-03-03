@@ -12,12 +12,12 @@ class Screen:
         self.text_background = (170, 0, 0)  # Default to RED
         self.text_color = (170, 0, 0)  # Default to RED
         self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
-
+        
     def goto_xy(self, x, y):
-        if x not in range(0, 80) or y not in range(0, 25):
+        if x not in range(1, 81) or y not in range(1, 26):
             raise ValueError("GotoXY out of bounds.")
-        cursor_x = x * 8
-        cursor_y = y * 16
+        cursor_x = (x * 8) - 8
+        cursor_y = (y * 16) - 16
         self.cursor = (cursor_x, cursor_y)
 
     def write(self, text):
