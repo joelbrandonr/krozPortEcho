@@ -192,17 +192,66 @@ def difficultyScreen():
     screen.goto_xy(30,1)
     screen.write("ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ")
     
+    screen.goto_xy(30,3)
+    screen.write("ßßßßßßßßßßßßßßßßßßßß")
+    
     screen.goto_xy(30,2)
     screen.set_text_color(WHITE)
     screen.write(" KINGDOM OF KROZ II ")
-    
-    screen.goto_xy(30,3)
-    screen.write("ßßßßßßßßßßßßßßßßßßßß")
 
     screen.set_text_color(WHITE)
     screen.set_text_background(BLUE)
     screen.goto_xy(25, 5)
     screen.write("An Apogee Software Production")
+    
+    screen.goto_xy(28, 7)
+    screen.write("Created by Scott Miller")
+    
+    screen.goto_xy(1, 9)
+    screen.set_text_color(LIGHT_CYAN)
+    screen.writeln('  Kingdom of Kroz is a game of adventure, exploration and survival.   You are')
+    screen.writeln('  a fearless archaeologist in search of the Magical Amulet,  hidden somewhere')
+    screen.writeln('  deep in the vast and dangerous underground kingdom.   You enter the kingdom')
+    screen.writeln('  through a secret tunnel and ignite your brass lantern. Your only protection')
+    screen.writeln('  is a worn leather whip and your ingenuity.  Sweat beading on your forehead,')
+    screen.writeln('                you embark on a journey that may be your last...')
+    
+    screen.set_text_color(LIGHT_GREEN)
+    screen.goto_xy(1,17)    
+    screen.write('         Use the cursor keys to move yourself (') 
+    screen.goto_xy(48,17)
+    screen.set_text_color(YELLOW)
+    screen.write('')
+    screen.goto_xy(49,17)
+    screen.set_text_color(LIGHT_GREEN)
+    screen.write(') through the kingdom.')
+    
+    screen.goto_xy(1,18)
+    screen.writeln('            Use your whip (press W) to destroy all nearby creatures.');
+    screen.writeln('       You are on your own to discover what other mysteries await--some');
+    screen.writeln('                           helpful, others deadly...');
+    
+    screen.goto_xy(13,22)
+    screen.set_text_color(YELLOW)
+    screen.write('Are you a ')
+    screen.set_text_color(WHITE)
+    screen.goto_xy(23,22)
+    screen.write('N')
+    screen.goto_xy(24,22)
+    screen.set_text_color(YELLOW)
+    screen.write('ovice, an ')
+    screen.goto_xy(34,22)
+    screen.set_text_color(WHITE)
+    screen.write('E')
+    screen.set_text_color(YELLOW)
+    screen.goto_xy(35,22)
+    screen.write('xperienced or an ')
+    screen.goto_xy(52,22)
+    screen.set_text_color(WHITE)
+    screen.write('A')
+    screen.set_text_color(YELLOW)
+    screen.goto_xy(53,22)
+    screen.write('dvanced player?')
     
     pygame.display.update()
 
@@ -210,9 +259,9 @@ def difficultyScreen():
 def main():
     
     # Calls menu screens
-    systemColor = colorScreen()
-    systemSpeed = speedScreen(systemColor) 
-    logoScreen()
+    #systemColor = colorScreen()
+    #systemSpeed = speedScreen(systemColor) 
+    #logoScreen()
     difficultyScreen()
 
     pygame.display.update()
