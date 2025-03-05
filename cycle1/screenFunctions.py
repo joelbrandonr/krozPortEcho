@@ -25,14 +25,12 @@ class Screen:
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
         self.window.blit(txt, self.cursor)
-        pygame.display.update()
     
     def writeln(self, text):
         txt = self.font.render(text, False, self.text_color)
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
         self.window.blit(txt, self.cursor)
-        pygame.display.update()
 
         cursor_x, cursor_y = self.cursor
         cursor_y += 16 
