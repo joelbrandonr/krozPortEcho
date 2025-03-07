@@ -12,6 +12,9 @@ class Screen:
         self.text_background = (170, 0, 0)  # Default to RED
         self.text_color = (170, 0, 0)  # Default to RED
         self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
+        self.monochrome_mode = False
+        self.color_iter = iter(COLORS)
+
         
     def goto_xy(self, x, y):
         if x not in range(1, 81) or y not in range(1, 26):
@@ -47,3 +50,43 @@ class Screen:
     def clear_screen(self):
         self.window.fill((0, 0, 0))
         self.cursor = (0, 0)
+
+    def setMonochrome(boolean):
+        self.monochrome_mode = boolean
+    
+    def Col(num1, num2):
+        if self.monochrome_mode == False:
+            TextColor(num1)
+        else:
+            TextColor(num2)
+    
+    def Bak(num1, num2):
+        if self.monochrome_mode == False:
+            TextBackground(num1)
+        else:
+            TextBackground(num2)
+    
+    def Flash(x, y, text):
+        x = (x * 8) - 8
+        y = (x * 16) - 16
+        #global color_iter
+        flashing = True
+    
+        while flashing:
+            try:
+                value = next(self.color_iter)
+            except StopIteration:
+                self.color_iter = iter(COLORS)
+                value = next(self.color_iter)
+    
+            txt = font.render(text, False, value)
+            window.blit(txt, (x, y))
+    
+            pygame.time.delay(20)
+            pygame.display.flip()
+    
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.KEYDOWN:
+                    flashing = False
