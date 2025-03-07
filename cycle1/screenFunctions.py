@@ -11,7 +11,7 @@ class Screen:
         self.cursor = (0, 0)
         self.text_background = (170, 0, 0)  # Default to RED
         self.text_color = (170, 0, 0)  # Default to RED
-        self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
+        self.font = pygame.font.Font("../PerfectDOSVGA437.ttf", 15)
         self.monochrome_mode = False
         self.color_iter = iter(COLORS)
 
