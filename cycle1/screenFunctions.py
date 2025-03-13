@@ -1,4 +1,5 @@
 import pygame
+from colors import COLORS
 
 pygame.init()
 pygame.font.init()
