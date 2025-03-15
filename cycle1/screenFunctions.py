@@ -17,20 +17,20 @@ class Screen:
         self.color_iter = iter(COLORS)
 
         
-    def goto_xy(self, x, y):
+    def GotoXY(self, x, y):
         if x not in range(1, 81) or y not in range(1, 26):
             raise ValueError("GotoXY out of bounds.")
         cursor_x = (x * 8) - 8
         cursor_y = (y * 16) - 16
         self.cursor = (cursor_x, cursor_y)
 
-    def write(self, text):
+    def Write(self, text):
         txt = self.font.render(text, False, self.text_color)
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
         self.window.blit(txt, self.cursor)
     
-    def writeln(self, text):
+    def Writeln(self, text):
         txt = self.font.render(text, False, self.text_color)
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
@@ -42,13 +42,13 @@ class Screen:
             cursor_y = 0 
         self.cursor = (cursor_x, cursor_y)
     
-    def set_text_background(self, color):
+    def TextBackground(self, color):
         self.text_background = color
 
-    def set_text_color(self, color):
+    def TextColor(self, color):
         self.text_color = color
 
-    def clear_screen(self):
+    def ClearScreen(self):
         self.window.fill((0, 0, 0))
         self.cursor = (0, 0)
 
