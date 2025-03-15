@@ -57,15 +57,15 @@ class Screen:
     
     def Col(self, num1, num2):
         if self.monochrome_mode == False:
-            TextColor(num1)
+            self.TextColor(num1)
         else:
-            TextColor(num2)
+            self.TextColor(num2)
     
     def Bak(self, num1, num2):
         if self.monochrome_mode == False:
-            TextBackground(num1)
+            self.TextBackground(num1)
         else:
-            TextBackground(num2)
+            self.TextBackground(num2)
     
     def Flash(self, x, y, text):
         x = (x * 8) - 8
