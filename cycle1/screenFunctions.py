@@ -80,7 +80,7 @@ class Screen:
                 self.color_iter = iter(COLORS)
                 value = next(self.color_iter)
     
-            txt = font.render(text, False, value)
+            txt = self.font.render(text, False, value)
             window.blit(txt, (x, y))
     
             pygame.time.delay(20)
