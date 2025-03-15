@@ -52,22 +52,22 @@ class Screen:
         self.window.fill((0, 0, 0))
         self.cursor = (0, 0)
 
-    def setMonochrome(boolean):
+    def setMonochrome(self, boolean):
         self.monochrome_mode = boolean
     
-    def Col(num1, num2):
+    def Col(self, num1, num2):
         if self.monochrome_mode == False:
             TextColor(num1)
         else:
             TextColor(num2)
     
-    def Bak(num1, num2):
+    def Bak(self, num1, num2):
         if self.monochrome_mode == False:
             TextBackground(num1)
         else:
             TextBackground(num2)
     
-    def Flash(x, y, text):
+    def Flash(self, x, y, text):
         x = (x * 8) - 8
         y = (x * 16) - 16
         #global color_iter
