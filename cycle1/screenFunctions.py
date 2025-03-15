@@ -81,7 +81,7 @@ class Screen:
                 value = next(self.color_iter)
     
             txt = self.font.render(text, False, value)
-            window.blit(txt, (x, y))
+            self.window.blit(txt, (x, y))
     
             pygame.time.delay(20)
             pygame.display.flip()
