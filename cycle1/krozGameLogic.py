@@ -84,7 +84,7 @@ class SoundPlayer:
 class KrozGameLogic:
     def __init__(self, sound_player=None, playfield=None):
         #grid dimensions
-        self.grid_width = 40  #original game dimensions
+        self.grid_width = 80  #original game dimensions
         self.grid_height = 25
         
         #creates playfield array or use the provided one
@@ -144,6 +144,10 @@ class KrozGameLogic:
         
     def set_player_position(self, x, y):
         """Set the player position"""
+        # Make sure x and y are within valid range
+        x = max(1, min(x, self.grid_width - 2))
+        y = max(1, min(y, self.grid_height - 2))
+        
         # Clear the player from their current position
         if self.pf[self.py][self.px] == PLAYER_ID:
             self.pf[self.py][self.px] = NULL
@@ -155,22 +159,25 @@ class KrozGameLogic:
         
     def add_enemy(self, enemy_type, x, y):
         """Add an enemy at a specific position"""
-        if 0 <= x < self.grid_width and 0 <= y < self.grid_height:
-            if enemy_type == SLOW:
-                self.s_num += 1
-                self.sx[self.s_num] = x
-                self.sy[self.s_num] = y
-                self.pf[y][x] = SLOW
-            elif enemy_type == MEDIUM:
-                self.m_num += 1
-                self.mx[self.m_num] = x
-                self.my[self.m_num] = y
-                self.pf[y][x] = MEDIUM
-            elif enemy_type == FAST:
-                self.f_num += 1
-                self.fx[self.f_num] = x
-                self.fy[self.f_num] = y
-                self.pf[y][x] = FAST
+        # Make sure x and y are within valid range
+        if not (0 <= x < self.grid_width and 0 <= y < self.grid_height):
+            return
+            
+        if enemy_type == SLOW:
+            self.s_num += 1
+            self.sx[self.s_num] = x
+            self.sy[self.s_num] = y
+            self.pf[y][x] = SLOW
+        elif enemy_type == MEDIUM:
+            self.m_num += 1
+            self.mx[self.m_num] = x
+            self.my[self.m_num] = y
+            self.pf[y][x] = MEDIUM
+        elif enemy_type == FAST:
+            self.f_num += 1
+            self.fx[self.f_num] = x
+            self.fy[self.f_num] = y
+            self.pf[y][x] = FAST
         
     def move(self, dx, dy):
         """Direct port of original move procedure"""
@@ -650,16 +657,88 @@ class KrozGameLogic:
             'game_over': self.game_over,
             'level_complete': self.level_complete
         }
-        
-# Example of how to use the KrozGameLogic class
-def example_usage():
-    # Create a game instance
-    game = KrozGameLogic()
+
+def run_kroz_game():
+    """Run the full Kroz game with pygame visualization"""
+    pygame.init()
+    pygame.font.init()
     
-    # Create a simple playfield for demonstration
+    # Set up the window and display
+    WINDOW_WIDTH = 640
+    WINDOW_HEIGHT = 400
+    window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    PLAY_WIDTH = 512
+    PLAY_HEIGHT = 370
+
+    pygame.display.set_caption("KINGDOM OF FRAUZ 2")
+
+    # Colors
+    BLACK = (0, 0, 0)
+    BLUE = (0, 0, 170)
+    GREEN = (0, 170, 0)
+    CYAN = (0, 170, 170)
+    RED = (170, 0, 0)
+    MAGENTA = (170, 0, 170)
+    BROWN = (170, 85, 0)
+    LIGHT_GRAY = (170, 170, 170)
+    DARK_GRAY = (85, 85, 85)
+    LIGHT_BLUE = (85, 85, 255)
+    LIGHT_GREEN = (85, 255, 85)
+    LIGHT_CYAN = (85, 255, 255)
+    LIGHT_RED = (255, 85, 85)
+    LIGHT_MAGENTA = (255, 85, 255)
+    YELLOW = (255, 255, 85)
+    WHITE = (255, 255, 255)
+
+    # Level data
+    level_1 = ['W W W W             2 2 2 2 2  C  2 2 2 2 2              W W W W',
+           'XXXXXXXXXXXXXXXXXXX###########   ###########XXXXXXXXXXXXXXXXXXXX',
+           ' 1           1                               1                  ',
+           '                                    1            XX         1   ',
+           '       1            1                           XXXX            ',
+           '#        XX                    +                 XX            #',
+           '##      XXXX  1                +          1          1        ##',
+           'T##      XX               2    +    2                        ##T',
+           'T1##                       W   +   W                        ##1T',
+           'T########X                 WX     XW             1    X########T',
+           '.        X                2WX  P  XW2                 X        .',
+           'T########X         1       WX     XW                  X########T',
+           'T1##                       W   +   W         1              ##1T',
+           'T##                       2    +    2                        ##T',
+           '##   1                         +                      XX      ##',
+           '#       XX      1              +                 1   XXXX     1#',
+           '       XXXX                 ##   ##                   XX        ',
+           '1       XX                 ##     ##     1        1           1 ',
+           '                    1#######       ########                     ',
+           '    1         ########11111  +++++  111111########              ',
+           'WW     ########+++++        #######         WWWWW########1    WW',
+           '########                     2 2 2                     C########',
+           'L2  +  X      #kingdom#of#kroz#ii#by#scott#miller#      X  +  2L']
+
+    # Create a game instance with a sound player
+    sound_player = SoundPlayer()
+    game = KrozGameLogic(sound_player)
+    
+    # Find player position in level
+    player_x, player_y = None, None
+    for y, line in enumerate(level_1):
+        if 'P' in line:
+            player_x = line.index('P')
+            player_y = y
+            break
+    
+    if player_x is None:
+        # Use a default position if no 'P' is found
+        player_x, player_y = 20, 12
+    
+    # Print debug info
+    print(f"Grid dimensions: {game.grid_width} x {game.grid_height}")
+    print(f"Found player at: {player_x}, {player_y}")
+    
+    # Initialize playfield with safe bounds
     playfield = [[NULL for x in range(game.grid_width)] for y in range(game.grid_height)]
     
-    # Add some walls
+    # Add walls around the border
     for x in range(game.grid_width):
         playfield[0][x] = WALL
         playfield[game.grid_height-1][x] = WALL
@@ -667,31 +746,192 @@ def example_usage():
         playfield[y][0] = WALL
         playfield[y][game.grid_width-1] = WALL
     
+    for y, line in enumerate(level_1):
+        for x, char in enumerate(line):
+
+            grid_x = x+1
+            grid_y = y+1
+
+            if grid_x >= game.grid_width or grid_y >= game.grid_height:
+                continue
+
+            if char == '#':
+                playfield[grid_y][grid_x] = WALL
+            elif char == 'X':
+                playfield[grid_y][grid_x] = MBLOCK_ID
+            elif char == '1':
+                #add slow enemy
+                playfield[grid_y][grid_x] = SLOW
+                game.add_enemy(SLOW, grid_x, grid_y)
+            elif char == '2':
+                #add medium enemy
+                playfield[grid_y][grid_x] = MEDIUM
+                game.add_enemy(MEDIUM, grid_x, grid_y)
+            elif char == 'F':
+                playfield[grid_y][grid_x] = FAST
+                game.add_enemy(FAST, grid_x,grid_y)
+            elif char == 'B':
+                playfield[grid_y][grid_x] = MBLOCK_ID
+                game.b_num += 1
+                game.bx[game.b_num] = grid_x
+                game.by[game.b_num] = grid_y
+            elif char == 'P':
+                player_x, player_y = grid_x, grid_y
+
     # Set the playfield
     game.set_playfield(playfield)
     
-    # Place the player
-    game.set_player_position(20, 12)
+    # Initialize player position (adjust to fit within grid)
+    print(f"Setting player at position: {player_x}, {player_y}")
     
-    # Add some enemies
-    game.add_enemy(SLOW, 10, 10)
-    game.add_enemy(MEDIUM, 30, 10)
-    game.add_enemy(FAST, 20, 5)
+    if player_x is not None and player_y is not None:
+        game.set_player_position(player_x,player_y)
+    else:
+        game.set_player_position(20, 12)  # Use safe default coordinates
     
-    # Now we can update the game state
-    game.update()
+    # Main game loop variables
+    p_x = (PLAY_WIDTH // 2)
+    p_y = (WINDOW_HEIGHT // 2) - 24
+    p_width = 8
+    p_height = 16
     
-    # Get the current game state for rendering
-    state = game.get_game_state()
-    print(f"Player position: ({state['player_x']}, {state['player_y']})")
-    print(f"Gems: {state['gems']}")
+    level_draw_x = 8
+    level_draw_y = 16
     
-    # Process player input (move east)
-    success = game.process_input('e')
-    print(f"Movement successful: {success}")
+    run = True
+    clock = pygame.time.Clock()
+
+    frame_counter = 0
     
-    # Update the game state again
-    game.update()
+    while run:
+        clock.tick(10)  # Control game speed
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        # Handle input
+        keys = pygame.key.get_pressed()
+        moved = False
+
+        old_p_x, old_p_y = p_x, p_y
+        
+        if keys[pygame.K_LEFT] and p_x > 8:
+            if game.process_input('w'):
+                p_x -= p_width
+                moved = True
+        if keys[pygame.K_RIGHT] and p_x < 520 - p_width:
+            if game.process_input('e'):
+                p_x += p_width
+                moved = True
+        if keys[pygame.K_UP] and p_y > 16:
+            if game.process_input('n'):
+                p_y -= p_height
+                moved = True
+        if keys[pygame.K_DOWN] and p_y < 384 - p_height:
+            if game.process_input('s'):
+                p_y += p_height
+                moved = True
+
+        if moved:
+            sound_player.FootStep(game.fast_pc)
+
+        frame_counter += 1
+        if frame_counter >= 5:
+            frame_counter = 0
+
+            game_state = game.update()
+        else:
+            game_state = game.get_game_state()
+        
+        # Check game state
+        if game_state['game_over']:
+            print("Game over!")
+            font = pygame.font.SysFont('Arial', 30)
+            game_over_text = font.render("GAME OVER", True, RED)
+            window.blit(game_over_text, (WINDOW_WIDTH//2 - 80, WINDOW_HEIGHT//2))
+            pygame.display.update()
+            pygame.time.delay(2000)
+            break
+        
+        # Drawing
+        window.fill(BLACK)
+        
+        # Draw HUD
+        pygame.draw.rect(window, BLUE, (528, 0, 112, 400))
+        
+        # Draw score and gems in HUD
+        font = pygame.font.SysFont('Arial', 16)
+        score_text = font.render(f"Score: {game_state['score']}", True, WHITE)
+        gems_text = font.render(f"Gems: {game_state['gems']}", True, WHITE)
+        window.blit(score_text, (540, 50))
+        window.blit(gems_text, (540, 80))
+        
+        # Draw borders
+        pygame.draw.rect(window, GREEN, (520, 0, 8, 400))  # right border
+        pygame.draw.rect(window, GREEN, (0, 0, 8, 400))    # left border
+        pygame.draw.rect(window, GREEN, (8, 0, 512, 16))   # top border
+        pygame.draw.rect(window, GREEN, (8, 384, 512, 16)) # bottom border
+        
+        # Draw level
+        level_draw_x = 8
+        level_draw_y = 16
+        for line in level_1:
+            for element in line:
+                if element == 'X':
+                    pygame.draw.rect(window, BROWN, (level_draw_x, level_draw_y, 8, 16))
+                if element == 'W':
+                    pygame.draw.rect(window, WHITE, (level_draw_x, level_draw_y, 8, 16))
+                if element == 'L':
+                    pygame.draw.rect(window, LIGHT_GRAY, (level_draw_x, level_draw_y, 8, 16))
+                if element == 'C':
+                    pygame.draw.rect(window, RED, (level_draw_x, level_draw_y, 8, 16))
+                if element == '+':
+                    pygame.draw.rect(window, GREEN, (level_draw_x, level_draw_y, 8, 16))
+                if element == 'T':
+                    pygame.draw.rect(window, LIGHT_MAGENTA, (level_draw_x, level_draw_y, 8, 16))
+                if element == '#':
+                    pygame.draw.rect(window, BROWN, (level_draw_x, level_draw_y, 8, 16))
+                level_draw_x += 8
+            level_draw_x = 8
+            level_draw_y += 16
+        level_draw_y = 16
+        
+        # Draw enemies from game state
+        for i in range(1, game.s_num + 1):
+            if game.sx[i] is not None:
+
+                enemy_x = (game.sx[i] - 1) * 8  # Adjust for grid/pixel conversion
+                enemy_y = (game.sy[i] - 1) * 16      # Adjust for grid/pixel conversion
+                pygame.draw.rect(window, LIGHT_RED, (enemy_x, enemy_y, 8, 16))
+        
+        for i in range(1, game.m_num + 1):
+            if game.mx[i] is not None:
+
+                enemy_x = (game.mx[i] - 1) * 8  # Adjust for grid/pixel conversion
+                enemy_y = (game.my[i] - 1) * 16      # Adjust for grid/pixel conversion
+                pygame.draw.rect(window, LIGHT_GREEN, (enemy_x, enemy_y, 8, 16))
+                
+        for i in range(1, game.f_num + 1):
+            if game.fx[i] is not None:
+
+                enemy_x = (game.fx[i] - 1) * 8  # Adjust for grid/pixel conversion
+                enemy_y = (game.fy[i] - 1) * 16      # Adjust for grid/pixel conversion
+                pygame.draw.rect(window, LIGHT_BLUE, (enemy_x, enemy_y, 8, 16))
+        
+        for i in range(1, game.b_num + 1):
+            if game.fx[i] is not None:
+
+                block_x = (game.bx[i] - 1) * 8
+                block_y = (game.by[i] - 1) * 16
+                pygame.draw.rect(window, BROWN, (block_x, block_y, 8, 16))
+        # Draw player (either use visual position or game logic position)
+        # Using visual position for now
+        pygame.draw.rect(window, YELLOW, (p_x, p_y, p_width, p_height))
+        
+        pygame.display.update()
     
+    pygame.quit()
+
 if __name__ == "__main__":
-    example_usage()
+    run_kroz_game()
