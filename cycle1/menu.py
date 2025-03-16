@@ -6,7 +6,6 @@ import random
 from screenFunctions import Screen
 from colors import *
 
-
 pygame.init()
 pygame.font.init()
 WINDOW_WIDTH = 640
@@ -15,9 +14,10 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("KINGDOM OF KROZ 2")
 screen = Screen()
 
+
 # Color menu
 def colorScreen():
-    screen.set_text_color(BLUE)
+    screen.set_text_color(1)
     screen.set_text_background(BLACK)
     screen.goto_xy(31, 2)
     screen.write("KINGDOM OF KROZ 2")
@@ -151,7 +151,7 @@ def logoScreen():
     screen.goto_xy(27,24)
     screen.write("Press any key to continue.")
     
-    # logo and variables
+    # logo and rainobow
     rainbow = [BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE, BROWN, LIGHT_GRAY, DARK_GRAY, LIGHT_BLUE, LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_MAGENTA]
     colorIndex = 0
 
@@ -177,7 +177,7 @@ def logoScreen():
         screen.writeln('     ÛÛÛ±±ÛÛÛ±       ÛÛÛ±±  ÛÛÛ±       ÛÛÛ±±     ÛÛÛ±±      ÛÛÛÛ±±±')
         screen.writeln('     ÛÛÛ±± ÛÛÛ±      ÛÛÛ±±   ÛÛÛ±       ÛÛÛÛÛÛÛÛÛÛÛ±±±     ÛÛÛÛÛÛÛÛÛÛÛÛÛ')
         screen.writeln('     ÛÛÛ±±  ÛÛÛ±       ±±±     ±±±        ±±±±±±±±±±±        ±±±±±±±±±±±±±')
-        screen.writeln('     ÛÛÛ±±   ÛÛÛ±');       
+        screen.writeln('     ÛÛÛ±±   ÛÛÛ±')
         screen.writeln('     ÛÛÛ±±    ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ')
         screen.writeln('       ±±±      ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±')
 
@@ -185,6 +185,8 @@ def logoScreen():
         pygame.time.delay(300)
 
         colorIndex = (colorIndex + 1) % len(rainbow)
+
+    screen.clear_screen()
 
 def difficultyScreen():
     window.fill(BLUE)
@@ -194,10 +196,6 @@ def difficultyScreen():
     
     screen.goto_xy(30,3)
     screen.write("ßßßßßßßßßßßßßßßßßßßß")
-    
-    screen.goto_xy(30,2)
-    screen.set_text_color(WHITE)
-    screen.write(" KINGDOM OF KROZ II ")
 
     screen.set_text_color(WHITE)
     screen.set_text_background(BLUE)
@@ -252,8 +250,37 @@ def difficultyScreen():
     screen.set_text_color(YELLOW)
     screen.goto_xy(53,22)
     screen.write('dvanced player?')
-    
-    pygame.display.update()
+
+    # logo and rainbow
+    rainbow = [BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE, BROWN, LIGHT_GRAY, DARK_GRAY, LIGHT_BLUE, LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_MAGENTA]
+    colorIndex = 0
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type ==pygame.KEYDOWN:
+                running = False
+
+        screen.set_text_color(rainbow[colorIndex])
+        screen.set_text_background(RED)
+        screen.goto_xy(30, 2)
+        screen.write(' KINGDOM OF KROZ II ')
+
+        screen.set_text_color(YELLOW)
+        screen.goto_xy(67, 22)
+        screen.write('N')
+        
+        pygame.display.update()
+        pygame.time.delay(300)
+
+        colorIndex = (colorIndex + 1) % len(rainbow)
+        
+    screen.clear_screen()
+
+
 
 # Program
 def main():
