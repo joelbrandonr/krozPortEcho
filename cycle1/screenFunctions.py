@@ -1,4 +1,5 @@
 import pygame
+from colors import COLORS
 
 pygame.init()
 pygame.font.init()
@@ -16,20 +17,22 @@ class Screen:
         self.color_iter = iter(COLORS)
 
         
-    def goto_xy(self, x, y):
+    def GotoXY(self, x, y):
         if x not in range(1, 81) or y not in range(1, 26):
             raise ValueError("GotoXY out of bounds.")
         cursor_x = (x * 8) - 8
         cursor_y = (y * 16) - 16
         self.cursor = (cursor_x, cursor_y)
 
-    def write(self, text):
+    def Write(self, text):
         txt = self.font.render(text, False, self.text_color)
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
         self.window.blit(txt, self.cursor)
+        pygame.display.flip()
+
     
-    def writeln(self, text):
+    def Writeln(self, text):
         txt = self.font.render(text, False, self.text_color)
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
@@ -40,33 +43,35 @@ class Screen:
         if cursor_y >= self.WINDOW_HEIGHT:
             cursor_y = 0 
         self.cursor = (cursor_x, cursor_y)
+        pygame.display.flip()
+
     
-    def set_text_background(self, color):
+    def TextBackground(self, color):
         self.text_background = color
 
-    def set_text_color(self, color):
+    def TextColor(self, color):
         self.text_color = color
 
-    def clear_screen(self):
+    def ClearScreen(self):
         self.window.fill((0, 0, 0))
         self.cursor = (0, 0)
 
-    def setMonochrome(boolean):
+    def setMonochrome(self, boolean):
         self.monochrome_mode = boolean
     
-    def Col(num1, num2):
+    def Col(self, num1, num2):
         if self.monochrome_mode == False:
-            TextColor(num1)
+            self.TextColor(num1)
         else:
-            TextColor(num2)
+            self.TextColor(num2)
     
-    def Bak(num1, num2):
+    def Bak(self, num1, num2):
         if self.monochrome_mode == False:
-            TextBackground(num1)
+            self.TextBackground(num1)
         else:
-            TextBackground(num2)
+            self.TextBackground(num2)
     
-    def Flash(x, y, text):
+    def Flash(self, x, y, text):
         x = (x * 8) - 8
         y = (x * 16) - 16
         #global color_iter
@@ -79,8 +84,8 @@ class Screen:
                 self.color_iter = iter(COLORS)
                 value = next(self.color_iter)
     
-            txt = font.render(text, False, value)
-            window.blit(txt, (x, y))
+            txt = self.font.render(text, False, value)
+            self.window.blit(txt, (x, y))
     
             pygame.time.delay(20)
             pygame.display.flip()

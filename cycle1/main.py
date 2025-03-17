@@ -20,5 +20,5 @@ def main():
 
     # Player move stuff!!!
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
