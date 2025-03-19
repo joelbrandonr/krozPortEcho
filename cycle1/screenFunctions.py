@@ -12,7 +12,7 @@ class Screen:
         self.cursor = (0, 0)
         self.text_background = (170, 0, 0)  # Default to RED
         self.text_color = (170, 0, 0)  # Default to RED
-        self.font = pygame.font.Font("../PerfectDOSVGA437.ttf", 15)
+        self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
         self.monochrome_mode = False
         self.color_iter = iter(COLORS)
 
@@ -45,16 +45,16 @@ class Screen:
         self.cursor = (cursor_x, cursor_y)
         pygame.display.flip()
 
-    
-    def TextBackground(self, color):
-        self.text_background = color
-
-    def TextColor(self, color):
-        self.text_color = color
-
     def ClearScreen(self):
-        self.window.fill((0, 0, 0))
+        self.window.fill(COLORS[0])
         self.cursor = (0, 0)
+        pygame.display.update() 
+    
+    def TextColor(self, color_index):
+        self.text_color = COLORS[color_index]
+
+    def TextBackground(self, color_index):
+        self.text_background = COLORS[color_index]
 
     def setMonochrome(self, boolean):
         self.monochrome_mode = boolean
