@@ -19,6 +19,7 @@ def main():
     # Level loader!!!
 
     # Player move stuff!!!
+    print("Main")
 
 if __name__ == "__main__":
     main()
