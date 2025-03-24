@@ -73,7 +73,7 @@ class Screen:
     
     def Flash(self, x, y, text):
         x = (x * 8) - 8
-        y = (x * 16) - 16
+        y = (y * 16) - 16
         #global color_iter
         flashing = True
     
