@@ -10,8 +10,8 @@ class Screen:
         self.WINDOW_HEIGHT = height
         self.window = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         self.cursor = (0, 0)
-        self.text_background = (170, 0, 0)  # Default to RED
-        self.text_color = (170, 0, 0)  # Default to RED
+        self.text_background = (0, 0, 0)  # Default to BLACK
+        self.text_color = (255, 255, 255)  # Default to WHITE
         self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
         self.monochrome_mode = False
         self.color_iter = iter(COLORS)
