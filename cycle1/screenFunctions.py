@@ -54,6 +54,9 @@ class Screen:
 
     def setMonochrome(self, boolean):
         self.monochrome_mode = boolean
+
+    def getMonochrome(self):
+        return self.monochrome_mode
     
     def Col(self, num1, num2):
         if self.monochrome_mode == False:
