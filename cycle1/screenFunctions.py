@@ -29,6 +29,7 @@ class Screen:
         txt_background = len(text) * 8
         pygame.draw.rect(self.window, self.text_background, (self.cursor[0], self.cursor[1], txt_background, 16))
         self.window.blit(txt, self.cursor)
+        self.cursor = (self.cursor[0] + (len(text) * 8), self.cursor[1])
         pygame.display.flip()
 
     
