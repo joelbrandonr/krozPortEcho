@@ -623,13 +623,15 @@ def aboutScreen():
 def main():
     
     # Calls menu screens
-    systemColor = colorScreen()
-    systemSpeed = speedScreen() 
-    logoScreen()
-    difficultyScreen()
-    registrationScreen()
-    if mainMenu() == "begin":
-        beginGame()
+    #systemColor = colorScreen()
+    #systemSpeed = speedScreen() 
+    #logoScreen()
+    #difficultyScreen()
+    #registrationScreen()
+    #if mainMenu() == "begin":
+    #    beginGame()
+    instructionScreen()    
+    
 
     pygame.display.update()
     pygame.time.delay(2000)
