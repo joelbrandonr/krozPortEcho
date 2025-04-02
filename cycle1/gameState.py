@@ -2,6 +2,8 @@ import random
 import time
 import numpy as np
 import pygame
+import os
+import pickle
 
 #constants from original Kroz file
 NULL = 0
@@ -23,9 +25,9 @@ class SoundPlayer:
         t = np.linspace(0, duration, int(sample_rate * duration), False)
         audio_data = 0.5 * np.sin(2 * np.pi * frequency * t)
         audio_data = (audio_data * 32767).astype(np.int16)
-        # Create stereo audio data by duplicating the mono data
+        # create stereo audio data by duplicating the mono data
         stereo_audio_data = np.column_stack((audio_data, audio_data))
-        # Create a sound object
+        # create a sound object
         sound = pygame.sndarray.make_sound(stereo_audio_data)
         sound.play(-1) # Play indefinitely
         
@@ -101,7 +103,11 @@ class KrozGameLogic:
         
         # Game variables
         self.score = 0
-        self.gems = 10
+        self.gems = 20
+        self.whips = 10
+        self.teleports = 0
+        self.keys = 0
+        self.whip_power = 1
         self.sideways = False
         
         # Enemy tracking
@@ -207,13 +213,116 @@ class KrozGameLogic:
         
         # Wall or other obstacle
         return False
+    
+    def use_whip(self):
+        """Implements the whip action from the original game"""
+        if self.whips < 1:
+            self.sound_player.Nonesound()
+            return False
+        
+        self.whips -= 1
+        self.sound_player.sound(70)
+
+
+        # Check all 8 directions around player and hit what's there
+        # The original hit() function would check the tile type and do damage
+        directions =  [
+            (-1, -1), (-1, 0), (-1, 1),  # Left column
+            (0, -1),           (0, 1),   # Middle column (excluding player position)
+            (1, -1),  (1, 0),  (1, 1)    # Right column
+        ]
+
+        for dx, dy in directions:
+            x, y = self.px + dx, self.py + dy
+            # check bounds
+            if 0 <= x < self.grid_width and 0 <= y < self.grid_height:
+                # Check what's at this position and handle it
+                if self.pf[y][x] in [SLOW, MEDIUM, FAST]:
+                    # Clear the enemy at this position
+                    self.pf[y][x] = NULL
+                    # Find and remove the enemy from the tracking arrays
+                    if self.pf[y][x] == SLOW:
+                        for i in range(1, self.s_num + 1):
+                            if self.sx[i] == x and self.sy[i] == y:
+                                self.sx[i] = None
+                                self.score += 1
+                                break
+                    elif self.pf[y][x] == MEDIUM:
+                        for i in range(1, self.m_num + 1):
+                            if self.mx[i] == x and self.my[i] == y:
+                                self.mx[i] = None
+                                self.score += 2
+                                break
+                    elif self.pf[y][x] == FAST:
+                        for i in range(1, self.f_num + 1):
+                            if self.fx[i] == x and self.fy[i] == y:
+                                self.fx[i] = None
+                                self.score += 3
+                                break
+
+        self.sound_player.nosound()
+        return True
+
+    def use_teleport(self):
+        """Implements the teleport action from the original game"""
+        if self.teleports < 1:
+            self.sound_player.NoneSound()
+            return False
+
+        self.teleports -= 1
+
+        #visual effects for teleportation 
+        for x in range(250):
+            self.sound_player.sound(random.randint(20,40))
+
+        #clear player from current position
+        self.pf[self.py][self.px] = self.replacement
+        self.replacement = NULL
+
+        #Find a valid teleport destination
+        found_spot = False
+        while not found_spot:
+            new_x = random.randint(1, self.grid_width - 2)
+            new_y = random.randint(1, self.grid_height - 2)
+
+            if self.pf[new_y][new_x] == NULL:
+                self.px = new_x
+                self.py = new_y 
+                self.pf[new_y][new_x] = PLAYER_ID
+                found_spot = True
+
+        self.sound_player.nosound()
+        return True
+
+    def use_key(self, x, y):
+        """Try to use a key at the specified position""" 
+        if self.keys < 1:
+             self.sound_player.NoneSound()
+             return False
+        
+        #check if there's a lock at the specified location
+        #you need to define what tile ID represents a lock
+        LOCK_ID = 13
+
+        if 0 <= x < self.grid_width and 0 <= y < self.grid_height:
+            if self.pf[y][x] == LOCK_ID:
+                self.keys -= 1
+                self.pf[y][x] = NULL  # Open the lock
+                self.sound_player.play(500, 300, 50)  # Play opening sound
+                return True
+            
+        return False
+
 
     def process_input(self, direction):
         """
-        Process player movement based on direction
-        direction should be one of: 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'
-        Returns True if movement was successful
+        Process player movement and actions based on input
+        direction should be one of: 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw', ' whip', 'teleport'
         """
+        if direction == 'whip':
+            return self.use_whip()
+        elif direction == 'teleport':
+            return self.use_teleport()    
         if direction == 'n':
             return self.move(0, -1)
         elif direction == 's':
@@ -638,13 +747,8 @@ class KrozGameLogic:
         self.move_fast()
         self.move_mblock()
         
-        # Return game state
-        return {
-            'game_over': self.game_over,
-            'level_complete': self.level_complete,
-            'score': self.score,
-            'gems': self.gems
-        }
+        # Return full game state
+        return self.get_game_state()
     
     def get_game_state(self):
         """Return the current game state for rendering"""
@@ -654,12 +758,52 @@ class KrozGameLogic:
             'player_y': self.py,
             'score': self.score,
             'gems': self.gems,
+            'whips': self.whips,
+            'teleports': self.teleports,
+            'keys': self.keys,
+            'whip_power': self.whip_power,
             'game_over': self.game_over,
             'level_complete': self.level_complete
         }
 
-def run_kroz_game():
-    """Run the full Kroz game with pygame visualization"""
+# Add save game function
+def save_game(game, current_level, p_x, p_y):
+    """Save the current game state to a file"""
+    save_data = {
+        'game_state': game.get_game_state(),
+        'current_level': current_level,
+        'player_visual_x': p_x,
+        'player_visual_y': p_y,
+        'slow_enemies': [(game.sx[i], game.sy[i]) for i in range(1, game.s_num + 1) if game.sx[i] is not None],
+        'medium_enemies': [(game.mx[i], game.my[i]) for i in range(1, game.m_num + 1) if game.mx[i] is not None],
+        'fast_enemies': [(game.fx[i], game.fy[i]) for i in range(1, game.f_num + 1) if game.fx[i] is not None],
+        'moving_blocks': [(game.bx[i], game.by[i]) for i in range(1, game.b_num + 1) if game.bx[i] is not None],
+        's_num': game.s_num,
+        'm_num': game.m_num,
+        'f_num': game.f_num,
+        'b_num': game.b_num
+    }
+    
+    # Create saves directory if it doesn't exist
+    if not os.path.exists('saves'):
+        os.makedirs('saves')
+    
+    # Save to file
+    with open('saves/kroz_save.dat', 'wb') as f:
+        pickle.dump(save_data, f)
+    
+    print("Game saved successfully!")
+    return True
+
+
+def run_kroz_game(current_level=1, load_save= False):
+    """
+    Run the Kroz game with enemy progression based on level number
+    - Level 1-4: Only slow enemies
+    - Level 5-9: Slow and medium enemies
+    - Level 10-14: Slow and fast enemies
+    - Level 15+: Slow, fast, and wall enemies
+    """
     pygame.init()
     pygame.font.init()
     
@@ -670,7 +814,7 @@ def run_kroz_game():
     PLAY_WIDTH = 512
     PLAY_HEIGHT = 370
 
-    pygame.display.set_caption("KINGDOM OF FRAUZ 2")
+    pygame.display.set_caption("KINGDOM OF FRAUZ 2 - LEVEL {current_level}")
 
     # Colors
     BLACK = (0, 0, 0)
@@ -718,6 +862,29 @@ def run_kroz_game():
     # Create a game instance with a sound player
     sound_player = SoundPlayer()
     game = KrozGameLogic(sound_player)
+
+    # try to load saved game if requested
+    p_x = (PLAY_WIDTH // 2)
+    p_y = (WINDOW_HEIGHT // 2) - 24
+
+    if load_save and os.path.exists('saves/kroz_save.dat'):
+        try:
+            with open('saves/kroz_save.dat', 'rb') as f:
+                save_data = pickle.load(f)
+                
+            # Load game state
+            current_level = save_data['current_level']
+            p_x = save_data['player_visual_x']
+            p_y = save_data['player_visual_y']
+            
+            # Initialize playfield and other data would be here...
+            # This is a simplified version - you'd need to fully restore
+            # the game state from the saved data
+            
+            print(f"Game loaded! Resuming level {current_level}")
+        except Exception as e:
+            print(f"Error loading saved game: {e}")
+            # Continue with a new game
     
     # Find player position in level
     player_x, player_y = None, None
@@ -734,6 +901,7 @@ def run_kroz_game():
     # Print debug info
     print(f"Grid dimensions: {game.grid_width} x {game.grid_height}")
     print(f"Found player at: {player_x}, {player_y}")
+    print(f"Current Level: {current_level}")
     
     # Initialize playfield with safe bounds
     playfield = [[NULL for x in range(game.grid_width)] for y in range(game.grid_height)]
@@ -746,9 +914,9 @@ def run_kroz_game():
         playfield[y][0] = WALL
         playfield[y][game.grid_width-1] = WALL
     
+    # Process level data with enemy progression based on current level
     for y, line in enumerate(level_1):
         for x, char in enumerate(line):
-
             grid_x = x+1
             grid_y = y+1
 
@@ -759,22 +927,40 @@ def run_kroz_game():
                 playfield[grid_y][grid_x] = WALL
             elif char == 'X':
                 playfield[grid_y][grid_x] = MBLOCK_ID
-            elif char == '1':
-                #add slow enemy
-                playfield[grid_y][grid_x] = SLOW
-                game.add_enemy(SLOW, grid_x, grid_y)
-            elif char == '2':
-                #add medium enemy
-                playfield[grid_y][grid_x] = MEDIUM
-                game.add_enemy(MEDIUM, grid_x, grid_y)
-            elif char == 'F':
-                playfield[grid_y][grid_x] = FAST
-                game.add_enemy(FAST, grid_x,grid_y)
+            elif char in ['1', '2', 'F']: # Add enemy character
+                # Determine which enemy type to use based on level
+                if current_level < 5:
+                    # levels 1-4: slow enemies
+                    playfield[grid_y][grid_x] = SLOW
+                    game.add_enemy(SLOW, grid_x, grid_y)
+                elif 5 <= current_level < 10:
+                    #replace slow with medium enemy
+                    playfield[grid_y][grid_x] = MEDIUM
+                    game.add_enemy(MEDIUM, grid_x, grid_y)
+                else:
+                    # levels 10+: all enemies are fast
+                    playfield[grid_y][grid_x] = FAST
+                    game.add_enemy(FAST, grid_x,grid_y)
+            elif char == 'W':
+                if current_level < 15:
+                    # level 1-14: wall enemies are normal walls
+                    playfield[grid_y][grid_x] = WALL
+                else:
+                    # level 15+: Add moving wall enemies
+                    playfield [grid_y][grid_x] = MBLOCK_ID
+                    game.b_num += 1
+                    game.bx[game.b_num] = grid_x
+                    game.by[game.b_num] = grid_y
             elif char == 'B':
-                playfield[grid_y][grid_x] = MBLOCK_ID
-                game.b_num += 1
-                game.bx[game.b_num] = grid_x
-                game.by[game.b_num] = grid_y
+                if current_level < 15:
+                    # levels 1-14: normal walls for moving blocks
+                    playfield[grid_y][grid_x] = WALL
+                else:
+                    # level 15+ : add moving blocks
+                    playfield[grid_y][grid_x] = MBLOCK_ID
+                    game.b_num += 1
+                    game.bx[game.b_num] = grid_x
+                    game.by[game.b_num] = grid_y
             elif char == 'P':
                 player_x, player_y = grid_x, grid_y
 
@@ -790,8 +976,6 @@ def run_kroz_game():
         game.set_player_position(20, 12)  # Use safe default coordinates
     
     # Main game loop variables
-    p_x = (PLAY_WIDTH // 2)
-    p_y = (WINDOW_HEIGHT // 2) - 24
     p_width = 8
     p_height = 16
     
@@ -800,17 +984,150 @@ def run_kroz_game():
     
     run = True
     clock = pygame.time.Clock()
-
     frame_counter = 0
+    paused = False
+    saved_message_timer = 0
     
+    # Define the sidebar drawing function
+    def draw_sidebar(window, game_state, current_level, saved_message = False):
+        """Draw the sidebar UI matching the reference image style with gray boxes for values"""
+        # Colors
+        BLACK = (0, 0, 0)
+        BLUE = (0, 0, 170)
+        WHITE = (255, 255, 255)
+        YELLOW = (255, 255, 85)
+        LIGHT_GRAY = (170, 170, 170)
+        RED = (255, 0, 0)
+        GREEN = (0, 255, 0)
+        
+        # Draw sidebar background
+        pygame.draw.rect(window, BLUE, (528, 0, 112, 400))
+        
+        # Font setup
+        title_font = pygame.font.SysFont('Arial', 18)
+        value_font = pygame.font.SysFont('Arial', 16)
+        option_font = pygame.font.SysFont('Arial', 16)
+        bold_font = pygame.font.SysFont('Arial', 16, bold=True)
+        
+        # Vertical position tracking
+        y_pos = 20
+        box_height = 24
+        box_spacing = 30  # Space between boxes
+        
+        # Draw Score with gray box
+        score_text = title_font.render("Score", True, WHITE)
+        window.blit(score_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw score value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        score_value = value_font.render(str(game_state['score']), True, BLACK)
+        window.blit(score_value, (560, y_pos + 4))  # Center text in box
+        y_pos += box_spacing
+        
+        # Draw Level with gray box
+        level_text = title_font.render("Level", True, WHITE)
+        window.blit(level_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw level value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        level_value = value_font.render(str(current_level), True, BLACK)
+        window.blit(level_value, (560, y_pos + 4))
+        y_pos += box_spacing
+        
+        # Draw Gems with gray box
+        gems_text = title_font.render("Gems", True, WHITE)
+        window.blit(gems_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw gems value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        gems_value = value_font.render(str(game_state['gems']), True, BLACK)
+        window.blit(gems_value, (560, y_pos + 4))
+        y_pos += box_spacing
+        
+        # Draw Whips with gray box
+        whips_text = title_font.render("Whips", True, WHITE)
+        window.blit(whips_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw whips value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        whips_value = value_font.render(str(game_state['whips']), True, BLACK)
+        window.blit(whips_value, (560, y_pos + 4))
+        y_pos += box_spacing
+        
+        # Draw Teleports with gray box
+        teleports_text = title_font.render("Teleports", True, WHITE)
+        window.blit(teleports_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw teleports value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        teleports_value = value_font.render(str(game_state['teleports']), True, BLACK)
+        window.blit(teleports_value, (560, y_pos + 4))
+        y_pos += box_spacing
+        
+        # Draw Keys with gray box
+        keys_text = title_font.render("Keys", True, WHITE)
+        window.blit(keys_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw keys value box
+        pygame.draw.rect(window, LIGHT_GRAY, (540, y_pos, 80, box_height))
+        keys_value = value_font.render(str(game_state['keys']), True, BLACK)
+        window.blit(keys_value, (560, y_pos + 4))
+        y_pos += box_spacing + 10
+        
+        # Draw OPTIONS header in red
+        options_text = title_font.render("OPTIONS", True, RED)
+        window.blit(options_text, (540, y_pos))
+        y_pos += 24
+        
+        # Draw options with first letter in bold to indicate keyboard shortcuts
+        options = ["Whip", "Teleport", "Pause", "Quit", "Save"]
+        for option in options:
+            # render first letter in bold
+            first_letter = bold_font.render(option[0], True, WHITE)
+            # render the rest of the world in regular font
+            rest_of_word = option_font.render(option[1:], True, WHITE)
+
+            # blit the first letter
+            window.blit(first_letter, (540, y_pos))
+
+            # Blit the rest of the word (position based on the width of first letter)
+            first_letter_width = bold_font.size(option[0])[0]
+            window.blit(rest_of_word, (540 + first_letter_width, y_pos))
+
+            y_pos += 20
+
+        # show "Game Saved!" message if recently saved
+        if saved_message:
+            saved_text = bold_font.render("Game Saved!", True, GREEN)
+            window.blit(saved_text, (540, y_pos + 10))
+
     while run:
         clock.tick(10)  # Control game speed
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        
-        # Handle input
+
+            # Handle key press events (for single press actions like P, Q, S)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:  # P for pause
+                    paused = not paused
+                    print("Game " + ("paused" if paused else "resumed"))
+                
+                if event.key == pygame.K_q:  # Q for quit
+                    run = False
+                
+                if event.key == pygame.K_s:  # S for save
+                    if save_game(game, current_level, p_x, p_y):
+                        saved_message_timer = 30  # Show message for ~3 seconds
+
+        # handle continuous input (for movement and actions
         keys = pygame.key.get_pressed()
         moved = False
 
@@ -836,6 +1153,7 @@ def run_kroz_game():
         if moved:
             sound_player.FootStep(game.fast_pc)
 
+        # update game state less frequently to control speed
         frame_counter += 1
         if frame_counter >= 5:
             frame_counter = 0
@@ -853,19 +1171,31 @@ def run_kroz_game():
             pygame.display.update()
             pygame.time.delay(2000)
             break
+
+        if game_state['level_complete']:
+            # Progress to next level
+            next_level = current_level + 1
+            print(f"Level {current_level} completed! Moving to level {next_level}")
+            pygame.display.update()
+            pygame.time.delay(1000)
+            
+            # Restart with next level (this would need proper implementation to work)
+            # For now, we'll just quit
+            run = False
+            # Ideally, we'd call run_kroz_game(next_level) here
+            break
+
+        if keys[pygame.K_w]:  # W for whip
+            if game.use_whip():
+                pass
+
+        if keys[pygame.K_t]:  # T for teleport
+            if game.use_teleport():
+                p_x = (game.px - 1) * 8 + 8
+                p_y = (game.py - 1) * 16 + 16
         
         # Drawing
         window.fill(BLACK)
-        
-        # Draw HUD
-        pygame.draw.rect(window, BLUE, (528, 0, 112, 400))
-        
-        # Draw score and gems in HUD
-        font = pygame.font.SysFont('Arial', 16)
-        score_text = font.render(f"Score: {game_state['score']}", True, WHITE)
-        gems_text = font.render(f"Gems: {game_state['gems']}", True, WHITE)
-        window.blit(score_text, (540, 50))
-        window.blit(gems_text, (540, 80))
         
         # Draw borders
         pygame.draw.rect(window, GREEN, (520, 0, 8, 400))  # right border
@@ -901,37 +1231,43 @@ def run_kroz_game():
         for i in range(1, game.s_num + 1):
             if game.sx[i] is not None:
 
-                enemy_x = (game.sx[i] - 1) * 8  # Adjust for grid/pixel conversion
-                enemy_y = (game.sy[i] - 1) * 16      # Adjust for grid/pixel conversion
+                enemy_x = (game.sx[i] - 1) * 8 + 8 # Adjust for grid/pixel conversion
+                enemy_y = (game.sy[i] - 1) * 16 + 16 # Adjust for grid/pixel conversion
                 pygame.draw.rect(window, LIGHT_RED, (enemy_x, enemy_y, 8, 16))
         
         for i in range(1, game.m_num + 1):
             if game.mx[i] is not None:
 
-                enemy_x = (game.mx[i] - 1) * 8  # Adjust for grid/pixel conversion
-                enemy_y = (game.my[i] - 1) * 16      # Adjust for grid/pixel conversion
+                enemy_x = (game.mx[i] - 1) * 8 + 8 # Adjust for grid/pixel conversion
+                enemy_y = (game.my[i] - 1) * 16 + 16     # Adjust for grid/pixel conversion
                 pygame.draw.rect(window, LIGHT_GREEN, (enemy_x, enemy_y, 8, 16))
                 
         for i in range(1, game.f_num + 1):
             if game.fx[i] is not None:
 
-                enemy_x = (game.fx[i] - 1) * 8  # Adjust for grid/pixel conversion
-                enemy_y = (game.fy[i] - 1) * 16      # Adjust for grid/pixel conversion
+                enemy_x = (game.fx[i] - 1) * 8 + 8 # Adjust for grid/pixel conversion
+                enemy_y = (game.fy[i] - 1) * 16 + 16     # Adjust for grid/pixel conversion
                 pygame.draw.rect(window, LIGHT_BLUE, (enemy_x, enemy_y, 8, 16))
         
         for i in range(1, game.b_num + 1):
             if game.fx[i] is not None:
 
-                block_x = (game.bx[i] - 1) * 8
-                block_y = (game.by[i] - 1) * 16
+                block_x = (game.bx[i] - 1) * 8 + 8
+                block_y = (game.by[i] - 1) * 16 + 16
                 pygame.draw.rect(window, BROWN, (block_x, block_y, 8, 16))
         # Draw player (either use visual position or game logic position)
         # Using visual position for now
         pygame.draw.rect(window, YELLOW, (p_x, p_y, p_width, p_height))
+
+        draw_sidebar(window, game_state, current_level)
         
         pygame.display.update()
     
     pygame.quit()
 
+def test_level(level_number):
+    """Test the game with a specific level number"""
+    run_kroz_game(level_number)
+
 if __name__ == "__main__":
-    run_kroz_game()
+    run_kroz_game(15)
