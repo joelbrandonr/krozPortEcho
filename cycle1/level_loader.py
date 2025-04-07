@@ -45,12 +45,14 @@ objectContainer.BNum = 0
 objectContainer.GenNum = 0
 objectContainer.PX = 0
 objectContainer.PY = 0
-objectContainer.Slow = None
-objectContainer.Medium = None
-objectContainer.Fast = None
+objectContainer.Slow = ' ' #None
+objectContainer.Medium = ' ' #None
+objectContainer.Fast = ' ' #None
 objectContainer.Difficulty = 2 # This needs to be integrated with menus!!!
 objectContainer.FastPC = True # This needs to be integrated with menus!!!
 objectContainer.MixUp = False # ??????????
+objectContainer.GemColor = 0
+objectContainer.HideTrap = False
 
 
 
@@ -62,7 +64,7 @@ objectContainer.Stairs = chr(240)     # Character code 240
 objectContainer.Chest = chr(67)       # Character code 67
 objectContainer.SlowTime = chr(232)  # Character code 232
 objectContainer.Gem = chr(4)          # Character code 4
-objectContainer.Invisible = chr(173)   # Character code 173
+objectContainer.Invisible = ' ' # chr(173)   # Character code 173
 objectContainer.Teleport = chr(24)    # Character code 24
 objectContainer.Key = chr(140)        # Character code 140
 objectContainer.Door = chr(236)       # Character code 236
@@ -155,36 +157,42 @@ objectContainer.Message = chr(5)      # Character code 5
 
 # Return game level of levelNumber
 def Level(screen, levelNumber):
-    #case statement
+    # case statement
     switcher = {
-        1: Level1(screen),
-        2: Level2(screen),
+        1: Level1,
+        2: Level2,
         # No level 3
-        4: Level4(screen),
+        4: Level4,
         # No level 5
-        6: Level6(screen),
+        6: Level6,
         # No level 7
-        8: Level8(screen),
+        8: Level8,
         # No level 9
-        10: Level10(screen),
+        10: Level10,
         # No level 11
-        12: Level12(screen),
+        12: Level12,
         # No level 13
-        14: Level14(screen),
+        14: Level14,
         # No level 15
-        16: Level16(screen),
+        16: Level16,
         # No level 17
-        18: Level18(screen),
+        18: Level18,
         # No level 19
-        20: Level20(screen),
+        20: Level20,
         # No level 21
-        22: Level22(screen),
+        22: Level22,
         # No level 23
-        24: Level24(screen),
-        25: Level25(screen),
+        24: Level24,
+        25: Level25,
     }
 
-    return switcher.get(levelNumber, "Invalid option")
+    # Get the function from the switcher dictionary
+    level_function = switcher.get(levelNumber, None)
+
+    if level_function:
+        return level_function(screen)  # Call the function with the screen argument
+    else:
+        return "Invalid option"
 
 
 # Return game level 1
@@ -213,7 +221,7 @@ def Level1(screen):
     objectContainer.FP[21] = 'WW     ########+++++        #######         WWWWW########1    WW'
     objectContainer.FP[22] = '########¯                    2 2 2                     C########'
     objectContainer.FP[23] = 'L2  +  X      #kingdom#of#kroz#ii#by#scott#miller#      X  +  2L'
-    Fast = chr(234)
+    objectContainer.Fast = chr(234)
     Convert_Format(screen)
 
 # Return game level 2
@@ -242,7 +250,7 @@ def Level2(screen):
     objectContainer.FP[21] = '   ##T#2   2     2  2  2 2   2 ###   2   2 2  2    2   2   ##222'
     objectContainer.FP[22] = '   #############################S#######################XXX##@@@'
     objectContainer.FP[23] = '                                                          I##LLL'
-    Fast = chr(234)
+    objectContainer.Fast = chr(234)
     Convert_Format(screen)
 
 # Return game level 4
@@ -251,9 +259,9 @@ def Level4(screen):
     objectContainer.FP[1]  = '-..............................3#1#2#3##------;------------;----'
     objectContainer.FP[2]  = '-##############################-##1#2#3#-######################-'
     objectContainer.FP[3]  = '-#.....----......- I#S###### ##K###1#2#3-#///////1///////////1//'
-    objectContainer.FP[4]  = '-#.-..-....-....-.# # I####1# ######1#2#-#\1\\\\\\\\\\\\\1\\\\\\'
+    objectContainer.FP[4]  = '-#.-..-....-....-.# # I####1# ######1#2#-#\\1\\\\\\\\\\\\\\\\\\\\\\\\\\1\\\\\\\\\\\\'
     objectContainer.FP[5]  = '-#-.-..-..-.....-.# # # ### ## ##1###1#2-#/////1////////////////'
-    objectContainer.FP[6]  = '-#-.-.-..-..---..-# # ## # ##1## # ###1#-#CCC\\\\\\\\\1\\\\\\1\\'
+    objectContainer.FP[6]  = '-#-.-.-..-..---..-# # ## # ##1## # ###1#-#CCC\\\\\\\\\\\\\\\\\\1\\\\\\\\\\\\1\\\\'
     objectContainer.FP[7]  = '-#-.-..-.-.-..-..-# # ### ####  ### K##1-#CCC/////1//////1/////K'
     objectContainer.FP[8]  = '-#-..--...-....--.# # ##################-#######################'
     objectContainer.FP[9]  = '-#-################                                           à '
@@ -271,7 +279,7 @@ def Level4(screen):
     objectContainer.FP[21] = '-----; #### RRR  ### ## ###@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#D'
     objectContainer.FP[22] = '-----# #####   # ##W W# ##@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@##@#D'
     objectContainer.FP[23] = '22222#      #####       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#L'
-    Fast = chr(234)
+    objectContainer.Fast = chr(234)
     Convert_Format(screen)
 
 # Return game level 6
@@ -300,8 +308,8 @@ def Level6(screen):
     objectContainer.FP[21] = '@2#-;;###RRRR##ñññññññ##RRR#7###.#K-#-#O#-#-#-#*YYYY-63333-#-#-#'
     objectContainer.FP[22] = '@###-###RRRR##X--------#RRR##ô##.#--#-#-#---#-######-#####-#---#'
     objectContainer.FP[23] = '-----##RRRR##%X---U----##RRR#K##--------#111#--------------#111#'
-    Fast = chr(234)
-    HideOpenWall = true
+    objectContainer.Fast = chr(234)
+    objectContainer.HideOpenWall = True
     Convert_Format(screen)
 
 # Return game level 8
@@ -330,12 +338,12 @@ def Level8(screen):
     objectContainer.FP[21] = '                                     ##-7  1   TTT7³##     ;   '
     objectContainer.FP[22] = '¼       1 1 1 1 1 1 1 1 1 1 1 1 1 1 1##--#########³###³####;   '
     objectContainer.FP[23] = '###this#is#the#first#sideways#level####111111111  äC##        '
-    Fast = chr(234)
-    LavaFlow = true
-    LavaRate = 75
-    GravOn = True
-    GravRate = 0
-    Sideways = True
+    objectContainer.Fast = chr(234)
+    objectContainer.LavaFlow = True
+    objectContainer.LavaRate = 75
+    objectContainer.GravOn = True
+    objectContainer.GravRate = 0
+    objectContainer.Sideways = True
     Convert_Format(screen)
 
 # Return game level 10
@@ -364,8 +372,8 @@ def Level10(screen):
     objectContainer.FP[21] = '1(((((((TTT((((((((1##00-0-----0000000<[|"##I)))))))333))))-*I*I'
     objectContainer.FP[22] = '1((((((((((((((((((1##-#####################)))))))333))))-*I*I*'
     objectContainer.FP[23] = 'ó1111111111111111111##C-------D-D-D]]Eò&LL##K)))))333))))-*I*I*C'
-    Fast = chr(234)
-    HideGems = true
+    objectContainer.Fast = chr(234)
+    objectContainer.HideGems = True
     Convert_Format(screen)
 
 # Return game level 12
@@ -394,9 +402,9 @@ def Level12(screen):
     objectContainer.FP[21] = '00000-00000000000000000---000-00000001110-000K--<000OO000OOOOOó*'
     objectContainer.FP[22] = '--000-000000~~~0000000#---#00-00000000000-000000000000OOOO000000'
     objectContainer.FP[23] = '00C000000********3000##VVV##0-------------00000000bouldervilleÃ0'
-    Fast = chr(234)
-    LavaFlow = True
-    LavaRate = 30;
+    objectContainer.Fast = chr(234)
+    objectContainer.LavaFlow = True
+    objectContainer.LavaRate = 30;
     Convert_Format(screen)
 
 # Return game level 14
@@ -425,7 +433,7 @@ def Level14(screen):
     objectContainer.FP[21] = '((((###))))))))))))))))))))))))))))))))))))))))))))))))))###$$ôô'
     objectContainer.FP[22] = '"(###))))))))))))))))))))))))))))))))))))))))))))))))))))))###ôK'
     objectContainer.FP[23] = '###Kõ)))))))))))))))))))))))#three#))))))))))))))))))))))))F|###'
-    Fast = chr(234)
+    objectContainer.Fast = chr(234)
     Convert_Format(screen)
 
 # Return game level 16
@@ -454,9 +462,9 @@ def Level16(screen):
     objectContainer.FP[21] = '##O#####X###Q######-------N------`----------------------########'
     objectContainer.FP[22] = '##O##OOO###########-------N------`---------------------##X#####'
     objectContainer.FP[23] = '###OO###########################################################'
-    Fast = chr(234)
-    HideStairs = True
-    HideOpenWall = True
+    objectContainer.Fast = chr(234)
+    objectContainer.HideStairs = True
+    objectContainer.HideOpenWall = True
     Convert_Format(screen)
 
 # Return game level 18
@@ -485,8 +493,8 @@ def Level18(screen):
     objectContainer.FP[21] = '############################################################44##'
     objectContainer.FP[22] = 'LL---V--V-VV-V--VV---D-----D----D----D--66333333333333333-WWWW'
     objectContainer.FP[23] = 'LL--V-VV-V--V-VV--V--D-----D----D----D--66YYYYYYYYYYYYYYYYYYYY'
-    Fast = chr(234)
-    TreeRate = 35
+    objectContainer.Fast = chr(234)
+    objectContainer.TreeRate = 35
     Convert_Format(screen)
 
 # Return game level 20
@@ -515,7 +523,7 @@ def Level20(screen):
     objectContainer.FP[21] = '22222222)MMMMMM-MMMMMMMMMM-----MMMMMMMMMMMM-MMM-MM-MMMMM-MMMMMMM'
     objectContainer.FP[22] = '--222222)MMMMMM-----------MMMMMMMMMMMMMMMM-MM-M-MMM-M-M-MMMMM"MM'
     objectContainer.FP[23] = 'K-222222)MMMMMMMMMMMMMMMMMMMMMMMMMM|MMMMMMM--M-MMMMM-M-MMMMMMMMM'
-    Fast = chr(234)
+    objectContainer.Fast = chr(234)
     Convert_Format(screen)
 
 # Return game level 22
@@ -544,8 +552,8 @@ def Level22(screen):
     objectContainer.FP[21] = '$$$$$##                     RRRRRRRRRRRR                DDDD7777'
     objectContainer.FP[22] = 'MMMMM##                     RRRRRRRR                    DDDD77ôô'
     objectContainer.FP[23] = ']]K]]##                   RRRRRRK]                     DDDD77ô!'
-    Fast = chr(234)
-    HideCreate = true
+    objectContainer.Fast = chr(234)
+    objectContainer.HideCreate = True
     Convert_Format(screen)
 
 # Return game level 24
@@ -574,21 +582,21 @@ def Level24(screen):
     objectContainer.FP[21] = '               #             #                 + +#   ##C.!.C## '
     objectContainer.FP[22] = '               #             #                 + +#   ######### '
     objectContainer.FP[23] = 'VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'
-    Fast = chr(234)
-    GravOn = true
-    GravRate = 0
-    Sideways = true
-    LavaFlow = true
-    LavaRate = 75
+    objectContainer.Fast = chr(234)
+    objectContainer.GravOn = True
+    objectContainer.GravRate = 0
+    objectContainer.Sideways = True
+    objectContainer.LavaFlow = True
+    objectContainer.LavaRate = 75
     Convert_Format(screen)
 
 # Return game level 25
 def Level25(screen):
     global objectContainer
     objectContainer.FP[1]  = 'K¯    -++++++++++++++++#the#sacred#temple#+++++++++++++++-    ®K'
-    objectContainer.FP[2]  = ' VVVVVV11111111111111111111111111111111111111111111111111\\\\\\ '
-    objectContainer.FP[3]  = ' VVVV;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\\\ '
-    objectContainer.FP[4]  = ' VV1111111111;:::-:::111111111#####111111111::-:::::111111111\\ '
+    objectContainer.FP[2]  = ' VVVVVV11111111111111111111111111111111111111111111111111\\\\\\\\\\\\ '
+    objectContainer.FP[3]  = ' VVVV;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\\\\\\\\ '
+    objectContainer.FP[4]  = ' VV1111111111;:::-:::111111111#####111111111::-:::::111111111\\\\ '
     objectContainer.FP[5]  = ' V11         :-:-:-::        ###A###        :-:-:--:        11\\ '
     objectContainer.FP[6]  = 'X 1          ::-:::B:        RR#`#RR        :B::-::;         1 X'
     objectContainer.FP[7]  = 'X  22####-####-------------RRRR#D#RRRR-------------####-####22 X'
@@ -608,163 +616,169 @@ def Level25(screen):
     objectContainer.FP[21] = ' RRRR111111111-V V V-V V V-2-V*VCV*V-2-V V-V-V V V-11111111==== '
     objectContainer.FP[22] = 'áRRRRRR111111-V V V-2-V V V-V*V*V*V*V-V V V-2-V V V-11111======â'
     objectContainer.FP[23] = 'KááááááááááááVGVV V V V VV*V*V*V*V*VV V V V VVGVâââââââââââK'
-    Fast = chr(234)
-    MagicEWalls = true
+    objectContainer.Fast = chr(234)
+    objectContainer.MagicEWalls = True
     Convert_Format(screen)
 
 
 def Display_Playfield(screen):
     global objectContainer
 
+    screen.Bak(0, 0)
+    clearArea(screen, 1, 1, 66, 25)
+
     for XLoop in range(objectContainer.XBot, objectContainer.XTop + 1):
         for YLoop in range(objectContainer.YBot, objectContainer.YTop + 1):
-            print("Hi Ho!!!: " + str(XLoop) + " " + str(YLoop) + " " + str(objectContainer.PF[XLoop][YLoop]))
-            if (objectContainer.PF[XLoop][YLoop] != 0 or FloorPattern) and not HideLevel:
+            if (objectContainer.PF[XLoop][YLoop] != 0 or objectContainer.FloorPattern) and not objectContainer.HideLevel:
                 screen.GotoXY(XLoop, YLoop)
                 tile = objectContainer.PF[XLoop][YLoop]
 
-                #Print this tile with a bit of text before the tile
-                print(str(tile) + ":", end="")
-
-                if tile == 0:  # Floor
-                    screen.screen.Col(CF1, CF2)
+                if tile == None:
+                    screen.Bak(0, 0)
+                    screen.Write(' ')
+                elif tile == ' ':
+                    screen.Bak(0, 0)
+                    screen.Write(' ')
+                elif tile == 0:  # Floor
+                    screen.Col(CF1, CF2)
                     screen.Bak(BF1, BF2)
                     screen.Write(Tile)
                     screen.Bak(0, 0)
                 elif tile == 1:  # Slow
                     screen.Col(12, 7)
-                    screen.Write(Slow)
+                    screen.Write(objectContainer.Slow)
                 elif tile == 2:  # Medium
-                    screen.screen.Col(10, 7)
-                    screen.Write(Medium)
+                    screen.Col(10, 7)
+                    screen.Write(objectContainer.Medium)
                 elif tile == 3:  # Fast
-                    screen.screen.Col(9, 7)
-                    screen.Write(Fast)
+                    screen.Col(9, 7)
+                    screen.Write(objectContainer.Fast)
                 elif tile == 4:  # Block
                     if Level != 71:
                         screen.Col(6, 7)
                         screen.Write(objectContainer.Block)
                 elif tile == 5:  # Whip
-                    screen.screen.Col(15, 7)
-                    screen.Write(Whip)
+                    screen.Col(15, 7)
+                    screen.Write(objectContainer.Whip)
                 elif tile == 6:  # Stairs
-                    if not HideStairs:
+                    if not objectContainer.HideStairs:
                         screen.Bak(7, 7)
-                        screen.screen.Col(16, 16)
-                        screen.Write(Stairs)
+                        # Should set blink
+                        screen.Col(1, 1)
+                        screen.Write(objectContainer.Stairs)
                         screen.Bak(0, 0)
                 elif tile == 7:  # Chest
                     if random.randint(0, 19) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(14, 7)
+                        screen.Col(14, 7)
                         screen.Bak(4, 0)
-                        screen.Write(Chest)
+                        screen.Write(objectContainer.Chest)
                         screen.Bak(0, 0)
                 elif tile == 8:  # SlowTime
                     if random.randint(0, 34) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(11, 7)
-                        screen.Write(SlowTime)
+                        screen.Col(11, 7)
+                        screen.Write(objectContainer.SlowTime)
                 elif tile == 9:  # Gem
-                    if not HideGems:
-                        screen.screen.Col(GemColor, 7)
-                        screen.Write(Gem)
+                    if not objectContainer.HideGems:
+                        screen.Col(objectContainer.GemColor, 7)
+                        screen.Write(objectContainer.Gem)
                 elif tile == 10:  # Invisible
-                    screen.screen.Col(2, 7)
-                    screen.Write(Invisible)
+                    screen.Col(2, 7)
+                    screen.Write(objectContainer.Invisible)
                 elif tile == 11:  # Teleport
-                    screen.screen.Col(13, 7)
-                    screen.Write(Teleport)
+                    screen.Col(13, 7)
+                    screen.Write(objectContainer.Teleport)
                 elif tile == 12:  # Key
                     if random.randint(0, 24) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(12, 15)
-                        screen.Write(Key)
+                        screen.Col(12, 15)
+                        screen.Write(objectContainer.Key)
                 elif tile == 13:  # Door
                     screen.Bak(5, 7)
-                    screen.screen.Col(3, 0)
-                    screen.Write(Door)
+                    screen.Col(3, 0)
+                    screen.Write(objectContainer.Door)
                     screen.Bak(0, 0)
                 elif tile == 14:  # Wall
-                    screen.screen.Col(6, 7)
-                    screen.Write(Wall)
+                    screen.Col(6, 7)
+                    screen.Write(objectContainer.Wall)
                 elif tile == 15:  # SpeedTime
                     if random.randint(0, 9) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(11, 7)
-                        screen.Write(SpeedTime)
+                        screen.Col(11, 7)
+                        screen.Write(objectContainer.SpeedTime)
                 elif tile == 16:  # Trap
-                    if not HideTrap:
-                        screen.screen.Col(7, 7)
-                        screen.Write(Trap)
+                    if not objectContainer.HideTrap:
+                        screen.Col(7, 7)
+                        screen.Write(objectContainer.Trap)
                 elif tile == 17:  # River or Lava
                     if Level == 56:
-                        screen.screen.Col(12, 16)
+                        screen.Col(12, 16)
                         screen.Bak(4, 7)
-                        screen.Write(Lava)
+                        screen.Write(objectContainer.Lava)
                         screen.Bak(0, 0)
                     else:
-                        screen.screen.Col(9, 0)
+                        screen.Col(9, 0)
                         screen.Bak(1, 7)
-                        screen.Write(River)
+                        screen.Write(objectContainer.River)
                         screen.Bak(0, 0)
                 elif tile == 18:  # Power
                     if random.randint(0, 14) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Power)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Power)
                 elif tile == 19:  # Forest
-                    screen.screen.Col(2, 7)
-                    screen.Write(Forest)
+                    screen.Col(2, 7)
+                    screen.Write(objectContainer.Forest)
                     screen.Bak(0, 0)
                 elif tile in [20, 252]:  # Tree
-                    screen.screen.Col(6, 0)
+                    screen.Col(6, 0)
                     screen.Bak(2, 7)
-                    screen.Write(Tree)
+                    screen.Write(objectContainer.Tree)
                     screen.Bak(0, 0)
                 elif tile == 21:  # Bomb
                     if random.randint(0, 39) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                     else:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Bomb)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Bomb)
                 elif tile == 22:  # Lava
-                    screen.screen.Col(12, 16)
+                    screen.Col(12, 16)
                     screen.Bak(4, 7)
-                    screen.Write(Lava)
+                    screen.Write(objectContainer.Lava)
                     screen.Bak(0, 0)
                 elif tile == 23:  # Pit
-                    screen.screen.Col(7, 7)
-                    screen.Write(Pit)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.Pit)
                 elif tile == 24:  # Tome
-                    screen.screen.Col(31, 31)
+                    screen.Col(2, 2)
                     screen.Bak(5, 0)
-                    screen.Write(Tome)
+                    screen.Write(objectContainer.Tome)
                     screen.Bak(0, 0)
                 elif tile == 25:  # Tunnel
-                    screen.screen.Col(15, 7)
-                    screen.Write(Tunnel)
+                    screen.Col(15, 7)
+                    screen.Write(objectContainer.Tunnel)
                 elif tile == 26:  # Freeze
-                    screen.screen.Col(11, 7)
-                    screen.Write(Freeze)
+                    screen.Col(11, 7)
+                    screen.Write(objectContainer.Freeze)
                 elif tile == 27:  # Nugget
-                    screen.screen.Col(14, 7)
-                    screen.Write(Nugget)
+                    screen.Col(14, 7)
+                    screen.Write(objectContainer.Nugget)
                 elif tile == 28:  # Quake
                     if random.randint(0, 14) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                 elif tile == 29:  # IBlock
                     pass
                 elif tile == 30:  # IWall
@@ -774,133 +788,134 @@ def Display_Playfield(screen):
                 elif tile == 32:  # Stop
                     pass
                 elif tile == 34:  # Zap
-                    screen.screen.Col(12, 7)
-                    screen.Write(Zap)
+                    screen.Col(12, 7)
+                    screen.Write(objectContainer.Zap)
                 elif tile == 35:  # Create
-                    if not HideCreate:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                    if not objectContainer.HideCreate:
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                 elif tile == 36:  # Generator
-                    screen.screen.Col(30, 31)
-                    screen.Write(Generator)
+                    screen.Col(15, 15)
+                    screen.Write(objectContainer.Generator)
                 elif tile == 38:  # MBlock
-                    if not hideMBlock:
-                        screen.screen.Col(6, 7)
-                        screen.Write(MBlock)
+                    if not objectContainer.HideMBlock:
+                        screen.Col(6, 7)
+                        screen.Write(objectContainer.MBlock)
                 elif tile in [33, 37, 39, 67] or 224 <= tile <= 231:  # Trap2-13
                     pass
                 elif tile == 40:  # Player
                     screen.Bak(7, 7)
-                    screen.screen.Col(16, 16)
-                    screen.Write(Stairs)
+                    # Should set blink
+                    screen.Col(1, 1)
+                    screen.Write(objectContainer.Stairs)
                     screen.Bak(0, 0)
                 elif tile == 41:  # ShowGems
                     pass
                 elif tile == 42:  # Tablet
-                    screen.screen.Col(9, 7)
-                    screen.Write(Tablet)
+                    screen.Col(9, 7)
+                    screen.Write(objectContainer.Tablet)
                 elif tile == 43:  # ZBlock
-                    screen.screen.Col(6, 7)
-                    screen.Write(ZBlock)
+                    screen.Col(6, 7)
+                    screen.Write(objectContainer.ZBlock)
                 elif tile == 44:  # BlockSpell
                     pass
                 elif tile == 45:  # Chance
-                    screen.screen.Col(15, 7)
-                    screen.Write(Chance)
+                    screen.Col(15, 7)
+                    screen.Write(objectContainer.Chance)
                 elif tile == 46:  # Statue
-                    screen.screen.Col(31, 23)
-                    screen.Write(Statue)
+                    screen.Col(2, 8)
+                    screen.Write(objectContainer.Statue)
                 elif tile == 48:  # K
-                    screen.screen.Col(14, 15)
+                    screen.Col(14, 15)
                     screen.Write('K')
                 elif tile == 49:  # R
-                    screen.screen.Col(14, 15)
+                    screen.Col(14, 15)
                     screen.Write('R')
                 elif tile == 50:  # O
-                    screen.screen.Col(14, 15)
+                    screen.Col(14, 15)
                     screen.Write('O')
                 elif tile == 51:  # Z
-                    screen.screen.Col(14, 15)
+                    screen.Col(14, 15)
                     screen.Write('Z')
                 elif tile in [52, 53]:  # OWall1,2
-                    screen.screen.Col(6, 7)
-                    screen.Write(Wall)
+                    screen.Col(6, 7)
+                    screen.Write(objectContainer.Wall)
                 elif tile == 54:  # OWall3
-                    screen.screen.Col(7, 7)
-                    screen.Write(Wall)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.Wall)
                 elif 55 <= tile <= 57:  # CWall1..3
                     pass
                 elif 58 <= tile <= 60:  # OSpell1..3
                     if not HideOpenWall:
-                        screen.screen.Col(11, 7)
-                        screen.Write(OSpell1)
+                        screen.Col(11, 7)
+                        screen.Write(objectContainer.OSpell1)
                 elif 61 <= tile <= 63:  # CSpell1..3
                     pass
                 elif 68 <= tile <= 74:  # Triggers
                     pass
                 elif tile == 64:  # GBlock
-                    screen.screen.Col(7, 7)
-                    screen.Write(GBlock)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.GBlock)
                 elif tile == 65:  # Rock
-                    if not HideRock:
-                        screen.screen.Col(7, 7)
-                        screen.Write(Rock)
+                    if not objectContainer.HideRock:
+                        screen.Col(7, 7)
+                        screen.Write(objectContainer.Rock)
                 elif tile == 66:  # EWall
-                    screen.screen.Col(12, 0)
+                    screen.Col(12, 0)
                     screen.Bak(4, 7)
-                    screen.Write(EWall)
+                    screen.Write(objectContainer.EWall)
                     screen.Bak(0, 0)
                 elif tile == 47:  # WallVanish
                     if random.randint(0, 19) == 0:
-                        screen.screen.Col(15, 7)
-                        screen.Write(Chance)
+                        screen.Col(15, 7)
+                        screen.Write(objectContainer.Chance)
                 elif tile == 75:  # Rope
-                    screen.screen.Col(7, 7)
-                    screen.Write(Rope)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.Rope)
                 elif 76 <= tile <= 80:  # DropRope
-                    screen.screen.Col(7, 7)
-                    screen.Write(DropRope)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.DropRope)
                 elif tile == 82:  # ShootRight
-                    screen.screen.Col(7, 7)
-                    screen.Write(ShootRight)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.ShootRight)
                 elif tile == 83:  # ShootLeft
-                    screen.screen.Col(7, 7)
-                    screen.Write(ShootLeft)
+                    screen.Col(7, 7)
+                    screen.Write(objectContainer.ShootLeft)
                 elif tile == 81:  # Amulet
-                    screen.screen.Col(31, 31)
-                    screen.Write(Amulet)
+                    screen.Col(2, 2)
+                    screen.Write(objectContainer.Amulet)
                 elif tile == 180:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write('.')
                     screen.Bak(0, 0)
                 elif tile == 181:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write('?')
                     screen.Bak(0, 0)
                 elif tile == 182:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write('\'')
                     screen.Bak(0, 0)
                 elif tile == 183:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write(',')
                     screen.Bak(0, 0)
                 elif tile == 184:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write(':')
                     screen.Bak(0, 0)
                 elif tile == 195:  # punct.
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write('!')
                     screen.Bak(0, 0)
                 else:  # Letters
-                    screen.screen.Col(15, 0)
+                    screen.Col(15, 0)
                     screen.Bak(6, 7)
                     screen.Write(chr(tile).upper())
                     screen.Bak(0, 0)
@@ -935,8 +950,8 @@ def Convert_Format(screen):
 
     # Convert format based on FP array
     for YLoop in range(1, objectContainer.YSize + 1):  # 1 to YSize inclusive
-        for XLoop in range(1, objectContainer.XSize + 1):  # 1 to XSize inclusive
-            tempstr = objectContainer.FP[YLoop][XLoop - 1]  # Adjust for 0-based indexing in Python
+        for XLoop in range(1, objectContainer.XSize):
+            tempstr = objectContainer.FP[YLoop][XLoop]
             char_temp = tempstr[0]  # Get the first character
             
             # Map characters to PF values
@@ -953,9 +968,9 @@ def Convert_Format(screen):
                 objectContainer.MY[objectContainer.MNum] = YLoop
                 objectContainer.PF[XLoop][YLoop] = 2
             elif char_temp == '3':
-                FNum += 1
-                FX[FNum] = XLoop
-                FY[FNum] = YLoop
+                objectContainer.FNum += 1
+                objectContainer.FX[objectContainer.FNum] = XLoop
+                objectContainer.FY[objectContainer.FNum] = YLoop
                 objectContainer.PF[XLoop][YLoop] = 3
             elif char_temp == 'X':
                 objectContainer.PF[XLoop][YLoop] = 4
@@ -1023,20 +1038,20 @@ def Convert_Format(screen):
                 objectContainer.PF[XLoop][YLoop] = 35
             elif char_temp == 'G':
                 objectContainer.PF[XLoop][YLoop] = 36
-                GenNum += 1
+                objectContainer.GenNum += 1
             elif char_temp == '(':
                 objectContainer.PF[XLoop][YLoop] = 37
             elif char_temp == 'M':
-                BNum += 1
-                BX[BNum] = XLoop
-                BY[BNum] = YLoop
+                objectContainer.BNum += 1
+                objectContainer.BX[objectContainer.BNum] = XLoop
+                objectContainer.BY[objectContainer.BNum] = YLoop
                 objectContainer.PF[XLoop][YLoop] = 38
             elif char_temp == ')':
                 objectContainer.PF[XLoop][YLoop] = 39
             elif char_temp == 'P':
                 objectContainer.PF[XLoop][YLoop] = 40
-                PX = XLoop
-                PY = YLoop
+                objectContainer.PX = XLoop
+                objectContainer.PY = YLoop
             elif char_temp == '&':
                 objectContainer.PF[XLoop][YLoop] = 41
             elif char_temp == '!':
@@ -1049,7 +1064,7 @@ def Convert_Format(screen):
                 objectContainer.PF[XLoop][YLoop] = 45
             elif char_temp == '>':
                 objectContainer.PF[XLoop][YLoop] = 46
-                T[9] = 32000
+                objectContainer.T[9] = 32000
             elif char_temp == 'N':
                 objectContainer.PF[XLoop][YLoop] = 47
             elif char_temp == '<':
@@ -1166,12 +1181,7 @@ def New_Gem_Color(screen):
     return gem_color
 
 def Init_Screen(screen):
-    global Slow, Medium, Fast, Restart, Score, Level, Whips, Teleports, Keys, WhipPower
-    global Gems, FloorPattern, Replacement, Bonus, LavaFlow, LavaRate, Evaporate
-    global MagicEWalls, GravOn, GravRate, GravCounter, TreeRate, HideRock, HideStairs
-    global HideLevel, HideCreate, HideOpenWall, HideTrap, HideGems, HideMBlock
-    global FoundSet, GenNum, Sideways, OneMove, GenFactor, PX, PY, BTime, STime
-    global MTime, FTime, SkipTime, T, Color
+    global objectContainer 
 
     Slow = chr(142)
     Medium = chr(153)
@@ -1198,26 +1208,26 @@ def Init_Screen(screen):
     elif objectContainer.Difficulty == 2:
         Gems = 10
 
-    FloorPattern = False
-    Replacement = None
-    Bonus = 0
-    LavaFlow = False
-    LavaRate = 0
-    Evaporate = 0
-    MagicEWalls = False
-    GravOn = False
-    GravRate = 20
-    GravCounter = 0
-    TreeRate = -1
-    HideRock = False
-    HideStairs = False
-    HideLevel = False
-    HideCreate = False
-    HideOpenWall = False
-    HideTrap = False
-    HideGems = False
-    HideMBlock = False
-    FoundSet = set()
+    objectContainer.FloorPattern = False
+    objectContainer.Replacement = None
+    objectContainer.Bonus = 0
+    objectContainer.LavaFlow = False
+    objectContainer.LavaRate = 0
+    objectContainer.Evaporate = 0
+    objectContainer.MagicEWalls = False
+    objectContainer.GravOn = False
+    objectContainer.GravRate = 20
+    objectContainer.GravCounter = 0
+    objectContainer.TreeRate = -1
+    objectContainer.HideRock = False
+    objectContainer.HideStairs = False
+    objectContainer.HideLevel = False
+    objectContainer.HideCreate = False
+    objectContainer.HideOpenWall = False
+    objectContainer.HideTrap = False
+    objectContainer.HideGems = False
+    objectContainer.HideMBlock = False
+    objectContainer.FoundSet = set()
 
     if objectContainer.Difficulty in [2, 9]:
         FoundSet = set(range(256))
@@ -1253,10 +1263,8 @@ def Init_Screen(screen):
     objectContainer.T[8] = 6
 
     if not screen.getMonochrome():
-        window(67, 1, 80, 25)
         screen.Bak(1, 0)
-        screen.ClearScreen()
-        window(1, 1, 80, 25)
+        clearArea(screen, 67, 1, 80, 25)
 
     screen.Col(14, 7)
     screen.GotoXY(71, 1)
@@ -1307,6 +1315,12 @@ def Init_Screen(screen):
     screen.Col(7, 7)
     screen.Write('estore')
 
-def window(a, b, c, d):
-    print("Hi Ho, the boatman row!!!")
 
+def clearArea(screen, start_x, start_y, end_x, end_y):
+    for x in range(start_x, end_x + 1):
+        for y in range(start_y, end_y + 1):
+            #write location to log file
+            with open("log.log", 'a') as file:
+                file.write(f"Clearing area at ({x}, {y})\n")
+            screen.GotoXY(x, y)
+            screen.Write(' ')

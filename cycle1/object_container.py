@@ -39,6 +39,8 @@ class objectContainer:
         self.HideLevel = False
         self.FastPC = True
         self.MixUp = False
+        GemColor = 0;
+        HideTrap = False;
 
         self.Slow = None
         self.Medium = None
