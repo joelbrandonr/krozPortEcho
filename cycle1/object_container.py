@@ -132,3 +132,5 @@ class objectContainer:
         self.Trap12 = chr(0)
         self.Trap13 = chr(0)
         self.Message = chr(5)
+
+        self.LevelNumber = 1

@@ -150,6 +150,8 @@ objectContainer.Trap13 = chr(0)       # Character code 0
 # Message constant
 objectContainer.Message = chr(5)      # Character code 5
 
+# Start on level 1
+objectContainer.LevelNumber = 1
 
 
 
@@ -1314,6 +1316,41 @@ def Init_Screen(screen):
     screen.Write('R')
     screen.Col(7, 7)
     screen.Write('estore')
+
+def Next_Level(screen):
+    global objectContainer
+
+    if (objectContainer.LevelNumber == 1):
+        objectContainer.LevelNumber = 2
+    elif (objectContainer.LevelNumber == 2):
+        objectContainer.LevelNumber = 4
+    elif (objectContainer.LevelNumber == 4):
+        objectContainer.LevelNumber = 6
+    elif (objectContainer.LevelNumber == 6):
+        objectContainer.LevelNumber = 8
+    elif (objectContainer.LevelNumber == 8):
+        objectContainer.LevelNumber = 10
+    elif (objectContainer.LevelNumber == 10):
+        objectContainer.LevelNumber = 12
+    elif (objectContainer.LevelNumber == 12):
+        objectContainer.LevelNumber = 14
+    elif (objectContainer.LevelNumber == 14):
+        objectContainer.LevelNumber = 16
+    elif (objectContainer.LevelNumber == 16):
+        objectContainer.LevelNumber = 18
+    elif (objectContainer.LevelNumber == 18):
+        objectContainer.LevelNumber = 20
+    elif (objectContainer.LevelNumber == 20):
+        objectContainer.LevelNumber = 22
+    elif (objectContainer.LevelNumber == 22):
+        objectContainer.LevelNumber = 24
+    elif (objectContainer.LevelNumber == 24):
+        objectContainer.LevelNumber = 25
+    else:
+        print("No more levels available.")
+
+    Level(screen, objectContainer.LevelNumber)
+    Display_Playfield(screen)
 
 
 def clearArea(screen, start_x, start_y, end_x, end_y):
