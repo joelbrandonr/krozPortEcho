@@ -1,6 +1,7 @@
 from screenFunctions import Screen
 from object_container import objectContainer
 import random
+import time
 
 container = objectContainer()
 
@@ -45,9 +46,9 @@ objectContainer.BNum = 0
 objectContainer.GenNum = 0
 objectContainer.PX = 0
 objectContainer.PY = 0
-objectContainer.Slow = ' ' #None
-objectContainer.Medium = ' ' #None
-objectContainer.Fast = ' ' #None
+objectContainer.Slow = '' #None
+objectContainer.Medium = '”' #None
+objectContainer.Fast = 'ê' #None
 objectContainer.Difficulty = 2 # This needs to be integrated with menus!!!
 objectContainer.FastPC = True # This needs to be integrated with menus!!!
 objectContainer.MixUp = False # ??????????
@@ -63,7 +64,7 @@ objectContainer.Whip = chr(244)       # Character code 244
 objectContainer.Stairs = chr(240)     # Character code 240
 objectContainer.Chest = chr(67)       # Character code 67
 objectContainer.SlowTime = chr(232)  # Character code 232
-objectContainer.Gem = chr(4)          # Character code 4
+objectContainer.Gem = 'ø'          # Character code 4
 objectContainer.Invisible = ' ' # chr(173)   # Character code 173
 objectContainer.Teleport = chr(24)    # Character code 24
 objectContainer.Key = chr(140)        # Character code 140
@@ -94,7 +95,7 @@ objectContainer.Generator = chr(6)    # Character code 6
 objectContainer.Trap3 = chr(0)        # Character code 0
 objectContainer.MBlock = chr(178)     # Character code 178
 objectContainer.Trap4 = chr(0)        # Character code 0
-objectContainer.Player = chr(2)       # Character code 2
+objectContainer.Player = '' #chr(2)       # Character code 2
 objectContainer.Show_Gems = chr(0)    # Character code 0
 objectContainer.Tablet = chr(254)     # Character code 254
 objectContainer.ZBlock = chr(178)     # Character code 178
@@ -627,7 +628,7 @@ def Display_Playfield(screen):
     global objectContainer
 
     screen.Bak(0, 0)
-    clearArea(screen, 1, 1, 66, 25)
+    clearAreaOtherThanPlayer(screen, 1, 1, 66, 25)
 
     for XLoop in range(objectContainer.XBot, objectContainer.XTop + 1):
         for YLoop in range(objectContainer.YBot, objectContainer.YTop + 1):
@@ -806,10 +807,10 @@ def Display_Playfield(screen):
                 elif tile in [33, 37, 39, 67] or 224 <= tile <= 231:  # Trap2-13
                     pass
                 elif tile == 40:  # Player
-                    screen.Bak(7, 7)
+                    screen.Bak(0, 0)
                     # Should set blink
-                    screen.Col(1, 1)
-                    screen.Write(objectContainer.Stairs)
+                    screen.Col(14, 1)
+                    screen.Write(objectContainer.Player)
                     screen.Bak(0, 0)
                 elif tile == 41:  # ShowGems
                     pass
@@ -1174,13 +1175,14 @@ def Convert_Format(screen):
                 objectContainer.PF[XLoop][YLoop] = ord(char_temp)
 
 def New_Gem_Color(screen):
+    global objectContainer
+
     while True:
-        gem_color = random.randint(1, 15)  # Generates a random integer between 1 and 15
+        objectContainer.GemColor = random.randint(1, 15)  # Generates a random integer between 1 and 15
         if screen.getMonochrome():
-            gem_color = 7
-        if gem_color != 8:
+            objectContainer.GemColor = 7
+        if objectContainer.GemColor != 8:
             break
-    return gem_color
 
 def Init_Screen(screen):
     global objectContainer 
@@ -1320,6 +1322,8 @@ def Init_Screen(screen):
 def Next_Level(screen):
     global objectContainer
 
+    animatePlayerMovement(screen)
+
     if (objectContainer.LevelNumber == 1):
         objectContainer.LevelNumber = 2
     elif (objectContainer.LevelNumber == 2):
@@ -1352,12 +1356,113 @@ def Next_Level(screen):
     Level(screen, objectContainer.LevelNumber)
     Display_Playfield(screen)
 
+def animatePlayerMovement(screen):
+    global objectContainer
+
+    clearAreaOtherThanPlayer(screen, 1, 1, 66, 25)
+
+    targetX = 0
+    targetY = 0
+
+    if (objectContainer.LevelNumber == 1):
+        targetX = 32
+        targetY = 12
+    elif (objectContainer.LevelNumber == 2):
+        targetX = 13
+        targetY = 16
+    elif (objectContainer.LevelNumber == 4):
+        targetX = 30
+        targetY = 3
+    elif (objectContainer.LevelNumber == 6):
+        targetX = 62
+        targetY = 4
+    elif (objectContainer.LevelNumber == 8):
+        targetX = 32
+        targetY = 12
+    elif (objectContainer.LevelNumber == 10):
+        targetX = 1
+        targetY = 11
+    elif (objectContainer.LevelNumber == 12):
+        targetX = 31
+        targetY = 12
+    elif (objectContainer.LevelNumber == 14):
+        targetX = 29
+        targetY = 1
+    elif (objectContainer.LevelNumber == 16):
+        targetX = 32
+        targetY = 2
+    elif (objectContainer.LevelNumber == 18):
+        targetX = 58
+        targetY = 2
+    elif (objectContainer.LevelNumber == 20):
+        targetX = 22
+        targetY = 11
+    elif (objectContainer.LevelNumber == 22):
+        targetX = 5
+        targetY = 1
+    elif (objectContainer.LevelNumber == 24):
+        targetX = 32
+        targetY = 13
+    elif (objectContainer.LevelNumber == 25):
+        targetX = 32
+        targetY = 13
+
+    waypoint1X = random.randint(3, 64)
+    waypoint1Y = random.randint(3, 23)
+
+    waypoint2X = random.randint(3, 64)
+    waypoint2Y = random.randint(3, 23)
+
+    animatedPlayerMove(screen, waypoint1X, waypoint1Y)
+    animatedPlayerMove(screen, waypoint2X, waypoint2Y)
+    animatedPlayerMove(screen, targetX, targetY)
+
+def animatedPlayerMove(screen, targetX, targetY):
+    global objectContainer
+
+    currentX = objectContainer.PX
+    currentY = objectContainer.PY
+
+    screen.Bak(8, 0)
+    screen.Col(14, 1)
+
+    while(currentX != targetX or currentY != targetY):
+        screen.GotoXY(currentX, currentY)
+        screen.Write(' ')
+
+        if (currentX < targetX):
+            currentX += 1
+        elif (currentX > targetX):
+            currentX -= 1
+
+        if (currentY < targetY):
+            currentY += 1
+        elif (currentY > targetY):
+            currentY -= 1
+
+        screen.GotoXY(currentX, currentY)
+        screen.Write(objectContainer.Player)
+
+        time.sleep(0.02)
+
+    objectContainer.PX = currentX
+    objectContainer.PY = currentY
+
+    screen.Bak(0, 0)
+    screen.GotoXY(currentX, currentY)
+    screen.Write(objectContainer.Player)
 
 def clearArea(screen, start_x, start_y, end_x, end_y):
     for x in range(start_x, end_x + 1):
         for y in range(start_y, end_y + 1):
-            #write location to log file
-            with open("log.log", 'a') as file:
-                file.write(f"Clearing area at ({x}, {y})\n")
             screen.GotoXY(x, y)
             screen.Write(' ')
+
+def clearAreaOtherThanPlayer(screen, start_x, start_y, end_x, end_y):
+    global objectContainer
+
+    for x in range(start_x, end_x + 1):
+        for y in range(start_y, end_y + 1):
+            if (x != objectContainer.PX or y != objectContainer.PY):
+                screen.GotoXY(x, y)
+                screen.Write(' ')
