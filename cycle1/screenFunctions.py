@@ -94,3 +94,4 @@ class Screen:
                     pygame.quit()
                 elif event.type == pygame.KEYDOWN:
                     flashing = False
+    

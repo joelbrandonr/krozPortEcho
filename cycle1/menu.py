@@ -14,7 +14,15 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("KINGDOM OF KROZ 2")
 screen = Screen()
 
-
+def windowColor(num1, num2):
+    if screen.getMonochrome() == False:
+        return COLORS[num1]
+    else:
+        return COLORS[num2]
+    
+def fillWindow(num1, num2):
+    window.fill(windowColor(num1, num2))
+    
 # Color menu
 def colorScreen():
     screen.Col(9,9)  
@@ -129,6 +137,7 @@ def speedScreen():
 
 # Logo screen
 def logoScreen():
+    fillWindow(0,0)
     screen.Col(15,15)
     screen.Bak(0,0)
     screen.GotoXY(28,2)
@@ -161,7 +170,7 @@ def logoScreen():
             elif event.type ==pygame.KEYDOWN:
                 running = False
 
-        screen.TextColor(rainbow[colorIndex])
+        screen.Col(rainbow[colorIndex], 7)
         screen.Bak(0,0)
         screen.GotoXY(1, 5)
         screen.Writeln('     ÛÛÛ     ÛÛÛ     ÛÛÛÛÛÛÛÛÛÛ         ÛÛÛÛÛÛÛÛÛÛÛ        ÛÛÛÛÛÛÛÛÛÛÛÛÛ  (R)')
@@ -187,7 +196,7 @@ def logoScreen():
 
 # Difficulty Screen
 def difficultyScreen():
-    window.fill(COLORS[1])
+    fillWindow(1,0)
 
     screen.Bak(4,7)
     screen.GotoXY(30,1)
@@ -259,7 +268,7 @@ def difficultyScreen():
     inputBlinkTimer = pygame.time.get_ticks()
     rainbowBlinkTime = pygame.time.get_ticks()
 
-    screen.TextColor(rainbow[colorIndex])
+    screen.Col(rainbow[colorIndex], 0)
     screen.Bak(4,7)
     screen.GotoXY(30, 2)
     screen.Write(' KINGDOM OF KROZ II ')
@@ -329,7 +338,7 @@ def difficultyScreen():
 
         # Update rainbow title
         if current_time - rainbowBlinkTime >= 300:
-            screen.TextColor(rainbow[colorIndex])
+            screen.Col(rainbow[colorIndex], 0)
             screen.Bak(4,7)
             screen.GotoXY(30, 2)
             screen.Write(' KINGDOM OF KROZ II ')
@@ -365,7 +374,7 @@ def difficultyScreen():
 
         # Rainbow blinker (in selection of difficulty)
         if current_time - rainbowBlinkTime >= 300:
-            screen.TextColor(rainbow[colorIndex])
+            screen.Col(rainbow[colorIndex], 0)
             screen.Bak(4,7)
             screen.GotoXY(30, 2)
             screen.Write(' KINGDOM OF KROZ II ')
@@ -401,7 +410,7 @@ def difficultyScreen():
 
 # Registration screen
 def registrationScreen():
-    window.fill(COLORS[1])
+    fillWindow(1,0)
 
     screen.Col(15,15)
     screen.Bak(1,0)
@@ -469,7 +478,7 @@ def registrationScreen():
 
         if current_time - last_blink_time >= 300:
             screen.GotoXY(27,25)
-            screen.Col(0,0)
+            screen.Col(0,7)
             if blink:
                 screen.Write('Press any key to continue.')
             else:
@@ -608,7 +617,7 @@ def beginGame():
 #Instructions Screens
 def instructionScreen():
     #Screen1
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(32,2)
     screen.Col(14,7)
@@ -642,7 +651,7 @@ def instructionScreen():
 
     #Screen 2
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(32,2)
     screen.Col(14,7)
@@ -676,7 +685,7 @@ def instructionScreen():
     
     #Screen3
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(32,2)
     screen.Col(14,7)
@@ -783,7 +792,7 @@ def instructionScreen():
 
     #Screen 4
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(32,2)
     screen.Col(14,7)
@@ -818,7 +827,7 @@ def instructionScreen():
     
 def marketingScreen():
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(29,2)
     screen.Col(14,7)
@@ -856,7 +865,7 @@ def storyScreen():
     
     #Screen 1
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(29,2)
     screen.Col(14,7)
@@ -889,7 +898,7 @@ def storyScreen():
 
     #Screen 2
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(29,2)
     screen.Col(14,7)
@@ -924,7 +933,7 @@ def storyScreen():
     
 def originalScreen():
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(29,2)
     screen.Col(14,7)
@@ -959,7 +968,7 @@ def originalScreen():
     
 def aboutScreen():
     screen.ClearScreen()
-    window.fill(COLORS[1])
+    fillWindow(1,0)
     screen.Bak(1,0)
     screen.GotoXY(29,2)
     screen.Col(14,7)
