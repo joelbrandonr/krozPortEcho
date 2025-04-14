@@ -446,7 +446,10 @@ class KrozGameLogic:
                 self.sound_player.delay(25)
                 self.sound_player.nosound()
                 self.sx[loop] = None
-                self.gems -= 1
+                if self.s_type[loop] == '1':
+                    self.gems -= 1
+                elif self.s_type[loop] == '2':
+                    self.gems -= 2
 
                 if self.gems < 0:
                     self.player_died(True)
@@ -552,7 +555,10 @@ class KrozGameLogic:
                 self.sound_player.delay(25)
                 self.sound_player.nosound()
                 self.mx[loop] = None
-                self.gems -= 2  # Medium enemies take 2 gems
+                if self.m_type[loop] == '1':
+                    self.gems -= 1
+                elif self.m_type[loop] == '2':
+                    self.gems -= 2
 
                 if self.gems < 0:
                     self.player_died(True)
@@ -658,7 +664,10 @@ class KrozGameLogic:
                 self.sound_player.delay(25)
                 self.sound_player.nosound()
                 self.fx[loop] = None
-                self.gems -= 3  # Fast enemies take 3 gems
+                if self.f_type[loop] == '1':
+                    self.gems -= 1
+                elif self.f_type[loop] == '2':
+                    self.gems -= 2
 
                 if self.gems < 0:
                     self.player_died(True)
