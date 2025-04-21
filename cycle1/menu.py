@@ -71,6 +71,10 @@ def colorScreen():
     pygame.time.delay(100)
 
     screen.ClearScreen()
+    if systemColor == "color":
+        screen.setMonochrome(False)
+    else:
+        screen.setMonochrome(True)
     return systemColor
 
 # Speed menu
