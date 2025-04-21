@@ -28,21 +28,14 @@ def main():
     
     # Run through menu screens sequence
     game_settings["color_mode"] = colorScreen()
-    print("Color mode selected:", game_settings["color_mode"])
-
-    if game_settings["color_mode"] == "monochrome":
-        screen.setMonochrome(True)
-    else:
-        screen.setMonochrome(False)
-
     game_settings["speed"] = speedScreen()
     print("Speed selected:", game_settings["speed"])
-
+    
     logoScreen()
-
+    
     game_settings["difficulty"] = difficultyScreen()
     print("Difficulty selected:", game_settings["difficulty"])
-
+    
     registrationScreen()
     
     # Main menu selection
