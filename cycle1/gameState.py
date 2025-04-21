@@ -1024,15 +1024,15 @@ def run_kroz_game(current_level=1, load_save=False):
         pygame.draw.rect(window, BLUE, (528, 0, 112, 400))
 
         # Font setup
-        title_font = pygame.font.SysFont('Arial', 18)
-        value_font = pygame.font.SysFont('Arial', 16)
-        option_font = pygame.font.SysFont('Arial', 16)
-        bold_font = pygame.font.SysFont('Arial', 16, bold=True)
+        title_font = pygame.font.SysFont('Arial', 14)
+        value_font = pygame.font.SysFont('Arial', 14)
+        option_font = pygame.font.SysFont('Arial', 14)
+        bold_font = pygame.font.SysFont('Arial', 14, bold=True)
 
         # Vertical position tracking
         y_pos = 20
-        box_height = 24
-        box_spacing = 30  # Space between boxes
+        box_height = 20
+        box_spacing = 22  # Space between boxes
 
         # Draw Score with gray box
         score_text = title_font.render("Score", True, WHITE)
@@ -1120,7 +1120,7 @@ def run_kroz_game(current_level=1, load_save=False):
             first_letter_width = bold_font.size(option[0])[0]
             window.blit(rest_of_word, (540 + first_letter_width, y_pos))
 
-            y_pos += 20
+            y_pos += 13
 
         # show "Game Saved!" message if recently saved
         if saved_message:
@@ -1297,7 +1297,7 @@ def run_kroz_game(current_level=1, load_save=False):
         pygame.draw.rect(window, BLACK, (p_x, p_y, 8, 16))
         window.blit(kroz_font.render("", False, YELLOW), (p_x, p_y))
 
-        draw_sidebar(window, game_state, current_level)
+        draw_sidebar(window, game_state, current_level, saved_message_timer > 0)
 
         pygame.display.update()
 
