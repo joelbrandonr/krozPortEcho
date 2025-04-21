@@ -39,6 +39,8 @@ class objectContainer:
         self.HideLevel = False
         self.FastPC = True
         self.MixUp = False
+        GemColor = 0;
+        HideTrap = False;
 
         self.Slow = None
         self.Medium = None
@@ -130,3 +132,5 @@ class objectContainer:
         self.Trap12 = chr(0)
         self.Trap13 = chr(0)
         self.Message = chr(5)
+
+        self.LevelNumber = 1

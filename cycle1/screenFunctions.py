@@ -1,10 +1,23 @@
 import pygame
 from colors import COLORS
+import os
+import sys
 
 pygame.init()
 pygame.font.init()
 
 class Screen:
+    def resource_path(self, relative_path):
+        """ Get the absolute path to the resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+    
+        return os.path.join(base_path, relative_path)
+
+
     def __init__(self, width=640, height=400):
         self.WINDOW_WIDTH = width
         self.WINDOW_HEIGHT = height
@@ -12,7 +25,8 @@ class Screen:
         self.cursor = (0, 0)
         self.text_background = (0, 0, 0)  # Default to BLACK
         self.text_color = (255, 255, 255)  # Default to WHITE
-        self.font = pygame.font.Font("PerfectDOSVGA437.ttf", 15)
+        font_path = self.resource_path("PerfectDOSVGA437.ttf")
+        self.font = pygame.font.Font(font_path, 15)
         self.monochrome_mode = False
         self.color_iter = iter(COLORS)
 
