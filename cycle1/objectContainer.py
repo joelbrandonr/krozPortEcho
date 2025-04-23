@@ -134,3 +134,6 @@ class objectContainer:
         self.Message = chr(5)
 
         self.LevelNumber = 1
+
+        WINDOW_WIDTH = 640
+        WINDOW_WIDTH = 640
