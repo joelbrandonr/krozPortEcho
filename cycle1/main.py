@@ -6,7 +6,10 @@ import os
 from menu import (colorScreen, speedScreen, logoScreen, 
                         difficultyScreen, registrationScreen, mainMenu,
                         instructionScreen, marketingScreen, storyScreen,
-                        originalScreen, aboutScreen)
+                        originalScreen, aboutScreen, screen)
+
+# Import screen functions from screenFunctions.py
+from screenFunctions import Screen
 
 # Import game functionality from gameState.py
 from gameState import run_kroz_game
@@ -26,8 +29,13 @@ def main():
     # Run through menu screens sequence
     game_settings["color_mode"] = colorScreen()
     game_settings["speed"] = speedScreen()
+    print("Speed selected:", game_settings["speed"])
+    
     logoScreen()
+    
     game_settings["difficulty"] = difficultyScreen()
+    print("Difficulty selected:", game_settings["difficulty"])
+    
     registrationScreen()
     
     # Main menu selection

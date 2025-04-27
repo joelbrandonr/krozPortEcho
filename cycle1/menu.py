@@ -14,7 +14,15 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("KINGDOM OF KROZ 2")
 screen = Screen()
 
-
+def windowColor(num1, num2):
+    if screen.getMonochrome() == False:
+        return COLORS[num1]
+    else:
+        return COLORS[num2]
+    
+def fillWindow(num1, num2):
+    window.fill(windowColor(num1, num2))
+    
 # Color menu
 def colorScreen():
     screen.Col(9,9)  
@@ -63,6 +71,10 @@ def colorScreen():
     pygame.time.delay(100)
 
     screen.ClearScreen()
+    if systemColor == "color":
+        screen.setMonochrome(False)
+    else:
+        screen.setMonochrome(True)
     return systemColor
 
 # Speed menu
@@ -129,6 +141,7 @@ def speedScreen():
 
 # Logo screen
 def logoScreen():
+    fillWindow(0,0)
     screen.Col(15,15)
     screen.Bak(0,0)
     screen.GotoXY(28,2)
@@ -161,7 +174,7 @@ def logoScreen():
             elif event.type ==pygame.KEYDOWN:
                 running = False
 
-        screen.TextColor(rainbow[colorIndex])
+        screen.Col(rainbow[colorIndex], 7)
         screen.Bak(0,0)
         screen.GotoXY(1, 5)
         screen.Writeln('     ÛÛÛ     ÛÛÛ     ÛÛÛÛÛÛÛÛÛÛ         ÛÛÛÛÛÛÛÛÛÛÛ        ÛÛÛÛÛÛÛÛÛÛÛÛÛ  (R)')
@@ -187,7 +200,7 @@ def logoScreen():
 
 # Difficulty Screen
 def difficultyScreen():
-    window.fill(COLORS[1])
+    fillWindow(1,0)
 
     screen.Bak(4,7)
     screen.GotoXY(30,1)
@@ -220,7 +233,7 @@ def difficultyScreen():
     screen.Col(14,15)
     screen.Write('')
     screen.GotoXY(49,17)
-    screen.Col(10, 17)
+    screen.Col(10, 7)
     screen.Write(') through the kingdom.')
     
     screen.GotoXY(1,18)
@@ -259,7 +272,7 @@ def difficultyScreen():
     inputBlinkTimer = pygame.time.get_ticks()
     rainbowBlinkTime = pygame.time.get_ticks()
 
-    screen.TextColor(rainbow[colorIndex])
+    screen.Col(rainbow[colorIndex], 0)
     screen.Bak(4,7)
     screen.GotoXY(30, 2)
     screen.Write(' KINGDOM OF KROZ II ')
@@ -329,7 +342,7 @@ def difficultyScreen():
 
         # Update rainbow title
         if current_time - rainbowBlinkTime >= 300:
-            screen.TextColor(rainbow[colorIndex])
+            screen.Col(rainbow[colorIndex], 0)
             screen.Bak(4,7)
             screen.GotoXY(30, 2)
             screen.Write(' KINGDOM OF KROZ II ')
@@ -365,7 +378,7 @@ def difficultyScreen():
 
         # Rainbow blinker (in selection of difficulty)
         if current_time - rainbowBlinkTime >= 300:
-            screen.TextColor(rainbow[colorIndex])
+            screen.Col(rainbow[colorIndex], 0)
             screen.Bak(4,7)
             screen.GotoXY(30, 2)
             screen.Write(' KINGDOM OF KROZ II ')
@@ -401,7 +414,7 @@ def difficultyScreen():
 
 # Registration screen
 def registrationScreen():
-    window.fill(COLORS[1])
+    fillWindow(1,0)
 
     screen.Col(15,15)
     screen.Bak(1,0)
@@ -469,7 +482,7 @@ def registrationScreen():
 
         if current_time - last_blink_time >= 300:
             screen.GotoXY(27,25)
-            screen.Col(0,0)
+            screen.Col(0,7)
             if blink:
                 screen.Write('Press any key to continue.')
             else:
@@ -601,25 +614,400 @@ def mainMenu():
         elif choice == 'A':
             aboutScreen()
 
+#Starts game
 def beginGame():
     screen.ClearScreen()
 
+#Instructions Screens
 def instructionScreen():
-    screen.ClearScreen()
+    #Screen1
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(32,2)
+    screen.Col(14,7)
+    screen.Writeln('THE INSTRUCTIONS')
 
+    screen.GotoXY(32,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+
+    screen.GotoXY(1,5)
+    screen.Col(15,7)
+    screen.Writeln('   Kingdom of Kroz is a game of exploration and survival.  Your journey will')
+    screen.Writeln(' take you through 25 very dangerous chambers, each riddled with diabolical')
+    screen.Writeln(' traps and hideous creatures.   Hidden in the deepest chamber lies a hidden')
+    screen.Writeln(' treasure of immense value. Use the cursor pad to move 8 directions.')
+    screen.Writeln('   The chambers contain dozens of treasures, spells, traps and other unknowns.')
+    screen.Writeln(' Touching an object for the first time will reveal a little of its identity,')
+    screen.Writeln(' but it will be left to you to decide how best to use it--or avoid it.')
+    screen.Writeln('   When a creature touches you it will vanish, taking with it a few of your')
+    screen.Writeln(' gems that you have collected. If you have no gems then the creature will')
+    screen.Writeln(' instead take your life!  Whips can be used to kill nearby creatures, but')
+    screen.Writeln(' they''re better used to smash through "breakable walls" and other terrain.')
+    screen.Writeln('   Laptop and PCjr players can')
+    screen.Writeln(' use the alternate cursor             U I O      ( NW N NE )')
+    screen.Writeln(' pad instead of the cursor             J K       (   W E   )')
+    screen.Writeln(' keys to move your man, plus          N M ,      ( SW S SE )')
+    screen.Writeln(' the four normal cursor keys.')
+    screen.Writeln('   It''s a good idea to save your game at every new level, therefore, if you die')
+    screen.Writeln(' you can easily restore the game at that level and try again.')
+    screen.Writeln('   Registered users will get a "secret code" that makes this game much easier!')
+    screen.Flash(27,25,'Press any key to continue.')
+
+    #Screen 2
+    screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(32,2)
+    screen.Col(14,7)
+    screen.Writeln('THE INSTRUCTIONS')
+
+    screen.GotoXY(32,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+
+    screen.GotoXY(1,5)
+    screen.Col(15,7)
+    screen.Writeln('   Kingdom of Kroz will present you with many challenges. You will venture deep')
+    screen.Writeln(' underground and probably not make it out alive!')
+    screen.Writeln
+    screen.Writeln(' Hints:  þ Don''t forget to use the Home, End, PgUp, and PgDn keys to move your')
+    screen.Writeln('           on-screen character diagonally (along with the marked cursor keys).')
+    screen.Writeln('         þ Use your player to touch each new object to find out about it.  When')
+    screen.Writeln('           you first touch an object a message appears at the bottom of the')
+    screen.Writeln('           screen that describes it.')
+    screen.Writeln('         þ Collect keys to unlock doors, which usually block the stairs.')
+    screen.Writeln('         þ The faster monsters are the most dangerous to touch--they will knock')
+    screen.Writeln('           off three of your valuable gems.  The slowest creatures only take a')
+    screen.Writeln('           single gem from you, and the medium speed monsters take two.')
+    screen.Writeln
+    screen.Writeln('   Some levels have a Magical Gravity that will pull you downward!  On these')
+    screen.Writeln(' levels the game is played as if viewing the level from a side angle.  On')
+    screen.Writeln(' these levels you can only move upward by using a rope, a secret tunnel, or')
+    screen.Writeln(' by using a teleport scroll.  These unique "Sideways Levels" may take a')
+    screen.Writeln(' little getting used to, but are well worth the effort.  At the beginning of')
+    screen.Writeln(' a "sideways" level a message at the bottom of the screen will alert you.')
+    screen.Flash(27,25,'Press any key to continue.')
+    
+    #Screen3
+    screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(32,2)
+    screen.Col(14,7)
+    screen.Writeln('THE INSTRUCTIONS')
+
+    screen.GotoXY(32,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+
+    screen.GotoXY(1,5)
+    screen.Col(15,7)
+    screen.Writeln("   Here are some brief descriptions of the most common objects that you are")
+    screen.Writeln(' likely to find in the Kingdom of Kroz:')
+    screen.Writeln("")
+    
+    screen.Write(  '      ')
+    screen.Col(14,15)
+    screen.Write("")
+    screen.Col(15,7)
+    screen.Writeln(' - this is you, a dauntless archaeologist without peer')
+           
+    screen.Write(  '      ')
+    screen.Col(12,7)
+    screen.Write("")
+    screen.Col(15,7)
+    screen.Writeln(' - red creatures move slow and only knock off 1 gem when touched')
+           
+    screen.Write(  '      ')
+    screen.Col(10,7)
+    screen.Write("™")
+    screen.Col(15,7)
+    screen.Writeln(' - green creatures move faster and knock off 2 gems when touched')
+           
+    screen.Write(  '      ')
+    screen.Col(9,7)
+    screen.Write("ê")
+    screen.Col(15,7)
+    screen.Writeln(' - blue creatures move fastest and knock off 3 gems when touched')
+           
+    screen.Write(  '      ')
+    screen.Col(15,7)
+    screen.Write("ø")
+    screen.Col(15,7)
+    screen.Writeln(' - collect all the gems you can to survive creature attacks')
+           
+    screen.Write(  '      ')
+    screen.Write(chr(244))
+    screen.Writeln(' - whips are used to wipe out creatures and smash certain walls')
+           
+    screen.Write(  '      ')
+    screen.Col(13,7)
+    screen.Write(chr(24))
+    screen.Col(15,7)
+    screen.Writeln(' - teleport spells will magically transport you to a random place')
+           
+    screen.Write(  '      ')
+    screen.Col(14,7)
+    screen.Bak(4,0)
+    screen.Write(chr(67))
+    screen.Bak(1,0)
+    screen.Col(15,7)
+    screen.Writeln(' - chests contain a random number of gems and whips')
+           
+    screen.Write(  '      ')
+    screen.Col(12,15)
+    screen.Write(chr(140))
+    screen.Col(15,7)
+    screen.Write(' - collect keys to go through doors (')
+    screen.Col(3,0)
+    screen.Bak(5,7)
+           
+    screen.Write(chr(236))
+    screen.Col(15,7)
+    screen.Bak(1,0)
+    screen.Writeln(')')
+           
+    screen.Write(  '      ')
+    screen.Write(chr(9))
+    screen.Writeln(' - collect these power rings to make your whips more powerful')
+           
+    screen.Write(  '      ')
+    screen.Col(9,7)
+    screen.Write(chr(254))
+    screen.Col(15,7)
+    screen.Writeln(' - these tablets will give you clues, advice and warnings')
+           
+    screen.Write(  '      ')
+    screen.Write(chr(63))
+    screen.Writeln(' - this might be anything, including a big pouch of gems!')
+           
+    screen.Write(  '      ')
+    screen.Col(1,1)
+    screen.Bak(7,7)
+    screen.Write(chr(240))
+    screen.Col(15,7)
+    screen.Bak(1,0)
+    screen.Writeln(' - stairs take you to the next level deeper in Kroz')
+           
+    screen.Writeln("")
+    screen.Writeln('   There are dozens and dozens of other objects to discover.  The best way')
+    screen.Writeln(' to learn the usefulness of any new object is to touch it and read the brief')
+    screen.Writeln(' message that appears at the bottom of the screen.')
+    screen.Flash(27,25,'Press any key to continue.')
+
+
+    #Screen 4
+    screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(32,2)
+    screen.Col(14,7)
+    screen.Writeln('MISCELLANEOUS')
+
+    screen.GotoXY(32,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    
+    screen.Col(15,7)
+    screen.Writeln("")
+    screen.Writeln('  þ You can now save three different levels during a single game.  When you')
+    screen.Writeln('    select the "save" command you will also be asked to enter a letter, either')
+    screen.Writeln('    A, B or C.  If you just hit the space bar then A is the default selection.')
+    screen.Writeln('    These letters do not refer to disk drives!  They actually refer to the file')
+    screen.Writeln('    names used by the game.  The restore command lets use pick from A, B or C.')
+    screen.Writeln("")
+    screen.Writeln('  þ Sideways levels can be recognized by the pause message that appears at')
+    screen.Writeln('    the bottom of the screen, which states that it''s a "sideways" level.')
+    screen.Writeln("")
+    screen.Writeln('  þ If you are tired of seeing the descriptions at the bottom of the screen')
+    screen.Writeln('    that appear whenever you touch a new object, you can disable most of the')
+    screen.Writeln('    messages by pressing the minus (-) key.  The plus key (+) resets messages.')
+    screen.Writeln("")
+    screen.Writeln('  þ Kingdom of Kroz II is a completely updated and improved version over the')
+    screen.Writeln('    original version of Kingdom of Kroz.  If you desire to play the original')
+    screen.Writeln('    Kingdom of Kroz, please send $7.50.  Over 17 levels are different!')
+    screen.Flash(27,25,'Press any key to continue.')
+
+    mainMenu()
+    
 def marketingScreen():
     screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(29,2)
+    screen.Col(14,7)
+    screen.Writeln('THE MARKETING OF KROZ')
+    screen.GotoXY(29,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    screen.Col(15,7)
+    
+    screen.Writeln('   Kingdom of Kroz II is a user-supported game.  This means that the creator of')
+    screen.Writeln(' this program relies on the appreciation of honest players to pay the game''s')
+    screen.Writeln(' registration fee--$7.50.')
+    screen.Writeln('   Payment of this fee entitles you to all the free help and hints you might')
+    screen.Writeln(' need to enjoy the game.  All letters from registered users are answered')
+    screen.Writeln(' within two days.  (Try to get this kind of support from commercial games!)')
+    screen.Writeln('   Also, players can order the other Kroz sequels ONLY if this registration')
+    screen.Writeln(' fee is paid.  ($7.50 each or $20 for The Lost Adventures of Kroz.)')
+    screen.Writeln('   Everyone who orders (or registers) any of the other six Kroz games will also')
+    screen.Writeln(' get a "Hints, Tricks and Scoring Secrets" guide, and "The Domain of Kroz" map.')
+    screen.Writeln('   A single Kroz game takes several months to create, up to 200 hours per game!')
+    screen.Writeln(' I can''t afford to devote this much time without receiving something in return.')
+    screen.Writeln(' That is why I ask for this small fee, which is only necessary if you enjoy')
+    screen.Writeln(' this game.  In other words, try before you buy.')
+    screen.Writeln('   Even if you buy this game from a public domain or shareware library, I don''t')
+    screen.Writeln(' receive any of that money.  You''re simply paying for "storage, distribution,')
+    screen.Writeln(' disk, and handling."')
+    screen.Writeln('   Note:  The current Apogee Software address will ALWAYS BE VALID.  Foreign')
+    screen.Writeln(' orders are always welcome, please send U.S. funds/money orders only.')
+    screen.Flash(27,25,'Press any key to continue.')
+
+    mainMenu()
 
 def storyScreen():  
+    
+    #Screen 1
     screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(29,2)
+    screen.Col(14,7)
+    screen.Writeln('THE STORY BEHIND KROZ')
+    screen.GotoXY(29,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    screen.Col(15,7)
+    screen.Writeln('   The original Kroz Trilogy (consisting of Caverns of Kroz, Dungeons of Kroz,')
+    screen.Writeln(' and Kingdom of Kroz) was developed after I spent many hours playing another')
+    screen.Writeln(' explore-the-levels type game titled Rogue.  I never could finish Rogue,')
+    screen.Writeln(' though, because the game relied too much on luck and random occurrences.')
+    screen.Writeln('   The name "Kroz" is actually Zork (an Infocom text adventure) spelled in')
+    screen.Writeln(' reverse.  Many players still inquire about this bit of trivia.  The game was')
+    screen.Writeln(' first designed without predefined level layouts, meaning every level was a')
+    screen.Writeln(' random placement of creatures and play field objects.  New objects, like')
+    screen.Writeln(' spells, lava, doors, etc., were added quickly as the first Kroz game took')
+    screen.Writeln(' shape, including the ability to have predefined level floor plans.')
+    screen.Writeln('   My main objective was to create a game that wasn''t all fast paced action,')
+    screen.Writeln(' but also included strategy and puzzle solving.  Kingdom of Kroz was entered')
+    screen.Writeln(' in a national programming contest in 1988 and took top honors in the game')
+    screen.Writeln(' category, and number two overall (beaten by a spreadsheet program.)')
+    screen.Writeln('   The latest Kroz games have been greatly re-designed and re-programmed, but')
+    screen.Writeln(' the familiar appearance has been mostly maintained.  You will discover new')
+    screen.Writeln(' dangers, creatures and objects in your adventures below.')
+    screen.Writeln('   Thanks to all the players of Kroz who contributed dozens of suggestions,')
+    screen.Writeln(' ideas and improvements that were incorporated in later versions of Kroz.')
+    screen.Flash(27,25,'Press any key to continue.')
 
+    #Screen 2
+    screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(29,2)
+    screen.Col(14,7)
+    screen.Writeln('THE STORY BEHIND KROZ')
+    screen.GotoXY(29,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    screen.Col(15,7)
+    screen.Writeln('   Kroz is a hobby that''s gotten out of control!')
+    screen.Writeln('   Kroz is truly a phenomenon in the user-supported software market.  The')
+    screen.Writeln(' overwhelming success of the original Kroz games was completely unexpected.')
+    screen.Writeln(' Most (probably 99%) of all "shareware" games are not profitable for their')
+    screen.Writeln(' creator.  This is a well-known fact among the community of shareware game')
+    screen.Writeln(' authors, and one that I''ve verified by speaking to many other games de-')
+    screen.Writeln(' signers.  Most people simply don''t register games.')
+    screen.Writeln('   Through my research the Kroz games are the only user-supported games that')
+    screen.Writeln(' generate a substantial amount of registrations and orders for it''s creator,')
+    screen.Writeln(' namely, Scott Miller (me).  I don''t know what cord I''ve struck with players,')
+    screen.Writeln(' but everyday I receive fascinating and appreciative letters from players')
+    screen.Writeln(' telling me how much they enjoy the Kroz games.')
+    screen.Writeln('   Thanks to Kroz I now know what a mutual fund is, but on the downside my')
+    screen.Writeln(' taxes require a book two inches thick to figure out.')
+    screen.Writeln('   Will Kroz ever end?  I thought that THE FINAL CRUSADE would be the closing')
+    screen.Writeln(' chapter--but a flood of letters demanding more proved that I''m a pushover.')
+    screen.Writeln(' I guess as long as the letters keep coming, I''ll continue to make Kroz games.')
+    screen.Writeln(' After all, Kroz is like my second home now, one that I like to visit often...')
+    screen.Writeln('                                                        -- Scott Miller')
+    screen.Flash(27,25,'Press any key to continue.')
+    
+    mainMenu()
+    
 def originalScreen():
     screen.ClearScreen()
-
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(29,2)
+    screen.Col(14,7)
+    screen.Writeln('THE ORIGINAL KROZ GAMES')
+    screen.GotoXY(29,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    screen.Col(15,7)
+    
+    screen.Writeln('   The Lost Adventures of Kroz is the latest addition to the Kroz family of')
+    screen.Writeln(' games.  Before this game there are six more Kroz volumes, separated into two')
+    screen.Writeln(' triligies:  The Kroz Trilogy and The Super Kroz Trilogy.')
+    screen.Writeln('   The original Kroz Trilogy was such a surprising success that I decided to')
+    screen.Writeln(' created a second "Super Kroz" trilogy.  The first three original Kroz')
+    screen.Writeln(' games are:   þ Kingdom of Kroz  þ Caverns of Kroz  þ Dungeons of Kroz.')
+    screen.Writeln(' All three are still available and are constantly being updated and improved.')
+    screen.Writeln('   The original Kroz Trilogy games can be purchased for $7.50 each, or all 3')
+    screen.Writeln(' for $20 (these prices include postage, disks, and handling).')
+    screen.Writeln('   Only Kingdom of Kroz can be placed in a shareware library for distribution,')
+    screen.Writeln(' and the other two can only be ordered from Apogee Software Productions.')
+    screen.Writeln('   The Super Kroz Trilogy volumes are revamped and greatly improved.  They are')
+    screen.Writeln(' þ Return to Kroz  þ Temple of Kroz  þ The Final Crusade of Kroz.  The last')
+    screen.Writeln(' three volumes were supposed to be the end of Kroz, but the mail kept coming')
+    screen.Writeln(' and again I was impelled to create another Kroz adventure.')
+    screen.Writeln('   All Kroz games work on all monitors, either graphics or monochrome systems.')
+    screen.Writeln(' Plus, they only rely on keyboard control, and have slow-down routines that')
+    screen.Writeln(' permit them to function correctly on any speed IBM PC compatible computer.')
+    screen.Flash(27,25,'Press any key to continue.')
+    
+    mainMenu()
+    
 def aboutScreen():
     screen.ClearScreen()
+    fillWindow(1,0)
+    screen.Bak(1,0)
+    screen.GotoXY(29,2)
+    screen.Col(14,7)
+    screen.Writeln('ABOUT THE AUTHOR')
+    screen.GotoXY(29,3)
+    screen.Writeln('ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ')
+    
+    screen.Writeln("")
+    screen.Col(15,7)
+    
+    screen.Writeln('   Scott Miller, the creator of all the Kroz games, along with Supernova, Trek')
+    screen.Writeln(' Trivia and Beyond the Titanic (all shareware games) began programming in high')
+    screen.Writeln(' school in 1975.  Since then he''s created over 100 games and has had dozens')
+    screen.Writeln(' publishered by BIG BLUE DISK, I.B.Magazette and Keypunch Software.')
+    screen.Writeln("")
+    screen.Writeln('   For over three years he wrote two weekly computer columns for the Dallas')
+    screen.Writeln(' Morning News, one of the nation''s largest newspapers.  He also co-authored')
+    screen.Writeln(' a video game strategy book titled, "Shootout: Beating the Video Games."')
+    screen.Writeln(' Scott has written articles for COMPUTE!''s PC and PCjr Magazine and is a')
+    screen.Writeln(' software reviewer with COMPUTE! Publications.')         
+    screen.Writeln('')
+    screen.Writeln('   Hobbies include softball, running, tennis, karate (1st degree black belt),')
+    screen.Writeln(' drumming, rock music, science fiction, and creating new computer games.')
+    screen.Writeln(' Favorite computer games are M.U.L.E., Jumpman, Planetfall, Enchanter, Zork,')
+    screen.Writeln(' Spelunker, and Archon.  All are games of strategy, with action secondary.')
+    screen.Writeln("")
+    screen.Writeln('   Scott creates all Apogee Software programs on an AST Premium 80386 (20 Mhz)')
+    screen.Writeln(' equipped with VGA graphics, a NEC MultiSync II and an HP LaserJet series II.')
+    screen.Writeln(' The cost to market each Kroz game to the many shareware libraries and BBS''s')
+    screen.Writeln(' is over $2000 per game.  All of the appreciative letters make it worth it!')
+    screen.Flash(27,25,'Press any key to continue.')
 
-# Program
+    mainMenu()
+
+# Test programs
 def main():
     
     # Calls menu screens
@@ -629,7 +1017,7 @@ def main():
     difficultyScreen()
     registrationScreen()
     if mainMenu() == "begin":
-        beginGame()
+        beginGame()  
 
     pygame.display.update()
     pygame.time.delay(2000)
