@@ -39,8 +39,8 @@ class objectContainer:
         self.HideLevel = False
         self.FastPC = True
         self.MixUp = False
-        GemColor = 0;
-        HideTrap = False;
+        self.GemColor = 0;
+        self.HideTrap = False;
 
         self.Slow = None
         self.Medium = None
@@ -135,5 +135,6 @@ class objectContainer:
 
         self.LevelNumber = 1
 
-        WINDOW_WIDTH = 640
-        WINDOW_WIDTH = 640
+        self.WINDOW_WIDTH = 640
+
+        self.screen = None

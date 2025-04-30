@@ -4,6 +4,10 @@ import numpy as np
 import pygame
 import os
 import pickle
+from levelLoader import levelLoader
+import sys 
+import objectContainer
+from screenFunctions import Screen
 
 # constants from original Kroz file
 NULL = 0
@@ -14,6 +18,8 @@ WALL = 4
 PLAYER_ID = 40
 MBLOCK_ID = 38
 
+container = objectContainer.objectContainer()
+levelloader = levelLoader(container)
 
 class SoundPlayer:
     def __init__(self):
@@ -87,6 +93,33 @@ class SoundPlayer:
 
 class KrozGameLogic:
     def __init__(self, sound_player=None, playfield=None):
+
+        container_class = None
+        for name in  dir(objectContainer):
+            if not name.startswith('__'):
+                item = getattr(objectContainer, name)
+                if isinstance(item, type):
+                    container_class = item
+                    break
+
+        if container_class is None:
+            if isinstance(objectContainer, type):
+                container_class = objectContainer
+            else:
+                container_class = getattr(objectContainer, objectContainer.__name__, None)
+
+        if container_class:
+            container_instance = container_class()
+            print(f"Using container class: {container_class.__name__}")
+        else:
+            print("Could not find container class, creating a minimal compatible object")
+            class TempContainer:
+                def __init__(self):
+                    self.FP = [None] * 24
+                    self.PF = [[0 for _ in range(26)] for _ in range(67)]
+
+            container_instance = TempContainer()
+
         # grid dimensions
         self.grid_width = 80  # original game dimensions
         self.grid_height = 25
@@ -111,6 +144,7 @@ class KrozGameLogic:
         self.keys = 0
         self.whip_power = 1
         self.sideways = False
+        self.LevelNumber = 1
 
         # Enemy tracking
         self.s_num = 0  # Number of slow enemies
@@ -151,6 +185,125 @@ class KrozGameLogic:
         # Game state flag
         self.game_over = False
         self.level_complete = False
+
+    def load_level(self, level_number=None):
+        """Load a specific level or the current level if none specified"""
+        if level_number is not None:
+            self.LevelNumber = level_number
+    
+        # Check if level_loader is available
+        if self.level_loader:
+            print(f"Loading level {self.LevelNumber} using level loader")
+            try:
+                # Try to use the level loader
+                self.level_loader.Level(self.LevelNumber)
+            
+            # Try to get the player position
+                try:
+                    if hasattr(self.level_loader.objectContainer, 'PX') and hasattr(self.level_loader.objectContainer, 'PY'):
+                        self.set_player_position(
+                            self.level_loader.objectContainer.PX, 
+                            self.level_loader.objectContainer.PY
+                        )
+                        print(f"Player position set to {self.px}, {self.py}")
+                    else:
+                        print("Player position not found in level loader, using default")
+                except Exception as e:
+                    print(f"Error getting player position: {e}")
+                
+                # Try to get playfield data
+                try:
+                    if hasattr(self.level_loader.objectContainer, 'PF'):
+                        self.pf = self.level_loader.objectContainer.PF
+                        print("Playfield data loaded from level loader")
+                    else:
+                        print("Playfield data not found in level loader, using default")
+                except Exception as e:
+                    print(f"Error getting playfield data: {e}")
+                
+                return True
+                
+            except Exception as e:
+                print(f"Error loading level: {e}")
+                # Fallback to basic level
+                return self._load_fallback_level()
+        else:
+            print("Level loader not available, using fallback level")
+            return self._load_fallback_level()
+
+    def _load_fallback_level(self):
+        """Load a basic level in case the level loader fails"""
+        print("Loading fallback level")
+        # Create a simple level with walls around the border
+        for x in range(self.grid_width):
+            self.pf[0][x] = WALL
+            self.pf[self.grid_height-1][x] = WALL
+        for y in range(self.grid_height):
+            self.pf[y][0] = WALL
+            self.pf[y][self.grid_width-1] = WALL
+    
+        # Set player position
+        self.set_player_position(self.grid_width // 2, self.grid_height // 2)
+    
+        # Add a few enemies for testing
+        self.add_enemy(SLOW, 10, 10, '1')
+        self.add_enemy(MEDIUM, 30, 15, '1')
+        self.add_enemy(FAST, 50, 5, '1')
+    
+        return True
+    
+    def next_level(self):
+        """Progress to the next level based on levelLoader's progression"""
+        if self.LevelNumber == 1:
+            self.LevelNumber = 2
+        elif self.LevelNumber == 2:
+            self.LevelNumber = 4
+        elif self.LevelNumber == 4:
+            self.LevelNumber = 6
+        elif self.LevelNumber == 6:
+            self.LevelNumber = 8
+        elif self.LevelNumber == 8:
+            self.LevelNumber = 10
+        elif self.LevelNumber == 10:
+            self.LevelNumber = 12
+        elif self.LevelNumber == 12:
+            self.LevelNumber = 14
+        elif self.LevelNumber == 14:
+            self.LevelNumber = 16
+        elif self.LevelNumber == 16:
+            self.LevelNumber = 18
+        elif self.LevelNumber == 18:
+            self.LevelNumber = 20
+        elif self.LevelNumber == 20:
+            self.LevelNumber = 22
+        elif self.LevelNumber == 22:
+            self.LevelNumber = 24
+        elif self.LevelNumber == 24:
+            self.LevelNumber = 25
+        else:
+            # Game complete or invalid level
+            self.game_over = True
+            return self.get_game_state()
+    
+        # Load the new level
+        self.level_loader.Level(self.LevelNumber)
+    
+        # Set level complete flag to false
+        self.level_complete = False
+    
+        # Transfer level data from level_loader to game state
+        # This might vary based on how your code is structured
+        # For example:
+        self.pf = self.level_loader.objectContainer.PF
+    
+        # Update player position
+        if hasattr(self.level_loader.objectContainer, 'PX') and hasattr(self.level_loader.objectContainer, 'PY'):
+            self.set_player_position(self.level_loader.objectContainer.PX, self.level_loader.objectContainer.PY)
+    
+
+
+        # Return full game state
+        return self.get_game_state()
 
     def set_playfield(self, playfield):
         """Set the playfield from an external source"""
@@ -854,30 +1007,11 @@ def run_kroz_game(current_level=1, load_save=False):
     YELLOW = (255, 255, 85)
     WHITE = (255, 255, 255)
 
-    # Level data
-    level_1 = ['W W W W             2 2 2 2 2  C  2 2 2 2 2              W W W W',
-               'XXXXXXXXXXXXXXXXXXX###########   ###########XXXXXXXXXXXXXXXXXXXX',
-               ' 1           1                               1                  ',
-               '                                    1            XX         1   ',
-               '       1            1                           XXXX            ',
-               '#        XX                    +                 XX            #',
-               '##      XXXX  1                +          1          1        ##',
-               'T##      XX               2    +    2                        ##T',
-               'T1##                       W   +   W                        ##1T',
-               'T########X                 WX     XW             1    X########T',
-               '.        X                2WX  P  XW2                 X        .',
-               'T########X         1       WX     XW                  X########T',
-               'T1##                       W   +   W         1              ##1T',
-               'T##                       2    +    2                        ##T',
-               '##   1                         +                      XX      ##',
-               '#       XX      1              +                 1   XXXX     1#',
-               '       XXXX                 ##   ##                   XX        ',
-               '1       XX                 ##     ##     1        1           1 ',
-               '                    1#######       ########                     ',
-               '    1         ########11111  +++++  111111########              ',
-               'WW     ########+++++        #######         WWWWW########1    WW',
-               '########                     2 2 2                     C########',
-               'L2  +  X      #kingdom#of#kroz#ii#by_1#scott#miller#      X  +  2L']
+    levelloader.objectContainer.screen = Screen()
+
+    levelloader.Init_Screen()
+    levelloader.Level(1)
+    levelloader.Display_Playfield()
 
     # Create a game instance with a sound player
     sound_player = SoundPlayer()
@@ -897,10 +1031,6 @@ def run_kroz_game(current_level=1, load_save=False):
             p_x = save_data['player_visual_x']
             p_y = save_data['player_visual_y']
 
-            # Initialize playfield and other data would be here...
-            # This is a simplified version - you'd need to fully restore
-            # the game state from the saved data
-
             print(f"Game loaded! Resuming level {current_level}")
         except Exception as e:
             print(f"Error loading saved game: {e}")
@@ -908,10 +1038,11 @@ def run_kroz_game(current_level=1, load_save=False):
 
     # Find player position in level
     player_x, player_y = None, None
-    for y, line in enumerate(level_1):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):  # Start from 1
+        line = levelloader.objectContainer.FP[y]  # Access the line using 0-based index
         if 'P' in line:
-            player_x = line.index('P')
-            player_y = y
+            player_x = line.index('P')       # Convert to 1-based index
+            player_y = y                     # Already 1-based
             break
 
     if player_x is None:
@@ -935,8 +1066,8 @@ def run_kroz_game(current_level=1, load_save=False):
         playfield[y][game.grid_width - 1] = WALL
 
     # Process level data with enemy progression based on current level
-    for y, line in enumerate(level_1):
-        for x, char in enumerate(line):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):
+        for x, char in enumerate(levelloader.objectContainer.FP[y]):
             grid_x = x + 1
             grid_y = y + 1
 
@@ -1024,15 +1155,15 @@ def run_kroz_game(current_level=1, load_save=False):
         pygame.draw.rect(window, BLUE, (528, 0, 112, 400))
 
         # Font setup
-        title_font = pygame.font.SysFont('Arial', 18)
-        value_font = pygame.font.SysFont('Arial', 16)
-        option_font = pygame.font.SysFont('Arial', 16)
-        bold_font = pygame.font.SysFont('Arial', 16, bold=True)
+        title_font = pygame.font.SysFont('Arial', 14)
+        value_font = pygame.font.SysFont('Arial', 14)
+        option_font = pygame.font.SysFont('Arial', 14)
+        bold_font = pygame.font.SysFont('Arial', 14, bold=True)
 
         # Vertical position tracking
         y_pos = 20
-        box_height = 24
-        box_spacing = 30  # Space between boxes
+        box_height = 20
+        box_spacing = 22  # Space between boxes
 
         # Draw Score with gray box
         score_text = title_font.render("Score", True, WHITE)
@@ -1120,7 +1251,7 @@ def run_kroz_game(current_level=1, load_save=False):
             first_letter_width = bold_font.size(option[0])[0]
             window.blit(rest_of_word, (540 + first_letter_width, y_pos))
 
-            y_pos += 20
+            y_pos += 13
 
         # show "Game Saved!" message if recently saved
         if saved_message:
@@ -1195,16 +1326,13 @@ def run_kroz_game(current_level=1, load_save=False):
 
         if game_state['level_complete']:
             # Progress to next level
-            next_level = current_level + 1
-            print(f"Level {current_level} completed! Moving to level {next_level}")
+            game_state = game.next_level()
+            print(f"Level {current_level} completed! Moving to level {game.LevelNumber}")
+            
+            current_level = game.LevelNumber
+            
             pygame.display.update()
             pygame.time.delay(1000)
-
-            # Restart with next level (this would need proper implementation to work)
-            # For now, we'll just quit
-            run = False
-            # Ideally, we'd call run_kroz_game(next_level) here
-            break
 
         if keys[pygame.K_w]:  # W for whip
             if game.use_whip():
@@ -1228,8 +1356,8 @@ def run_kroz_game(current_level=1, load_save=False):
 
         level_draw_x = 8
         level_draw_y = 16
-        for line in level_1:
-            for element in line:
+        for y in range(1, len(levelloader.objectContainer.FP) - 1):
+            for element in levelloader.objectContainer.FP[y]:
                 # TODO: add proper characters
                 if element == 'X':
                     window.blit(kroz_font.render("²", False, BROWN), (level_draw_x, level_draw_y))
@@ -1297,7 +1425,7 @@ def run_kroz_game(current_level=1, load_save=False):
         pygame.draw.rect(window, BLACK, (p_x, p_y, 8, 16))
         window.blit(kroz_font.render("", False, YELLOW), (p_x, p_y))
 
-        draw_sidebar(window, game_state, current_level)
+        draw_sidebar(window, game_state, current_level, saved_message_timer > 0)
 
         pygame.display.update()
 
