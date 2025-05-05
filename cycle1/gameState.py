@@ -452,8 +452,8 @@ class KrozGameLogic:
         # Find a valid teleport destination
         found_spot = False
         while not found_spot:
-            new_x = random.randint(1, self.grid_width - 2)
-            new_y = random.randint(1, self.grid_height - 2)
+            new_x = random.randint(1, 64)
+            new_y = random.randint(1, 24)
 
             if self.pf[new_y][new_x] == NULL:
                 self.px = new_x
