@@ -944,6 +944,15 @@ class KrozGameLogic:
             'level_complete': self.level_complete
         }
 
+def resource_path(relative_path):
+    """ Get the absolute path to the resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # Add save game function
 def save_game(game, current_level, p_x, p_y):
@@ -1286,7 +1295,8 @@ def run_kroz_game(current_level=1, load_save=False):
             saved_text = bold_font.render("Game Saved!", True, GREEN)
             window.blit(saved_text, (540, y_pos + 10))
 
-    kroz_font = pygame.font.Font('PerfectDOSVGA437.ttf', 16)
+    font_path = resource_path("PerfectDOSVGA437.ttf")
+    kroz_font = pygame.font.Font(font_path, 16)
     while run:
         clock.tick(10)  # Control game speed
 
