@@ -39,7 +39,7 @@ Python-based for of KINGDOM Of KROZ II.
     pyinstaller --onefile --add-data "PerfectDOSVGA437.ttf:." main.py
     ```
 
-5. **Standalone executable will be located at `./dist/main`
+5. **Standalone executable will be located at `./dist/main`**
 
 ### Windows Instructions
 
@@ -74,4 +74,4 @@ Python-based for of KINGDOM Of KROZ II.
     pyinstaller --onefile --add-data "PerfectDOSVGA437.ttf;." main.py
     ```
 
-5. **Standalone executable will be located at `.\dist\main`
+5. **Standalone executable will be located at `.\dist\main`**
