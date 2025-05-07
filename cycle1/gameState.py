@@ -444,7 +444,6 @@ class KrozGameLogic:
             # Check if this is a collectible
             if new_pos_value == WHIP_PICKUP:
                 self.whips += 1
-                self.sound_player.play(800, 900, 50)  
                 new_pos_value = NULL  
                 
                 grid_x = new_x - 1  
@@ -455,8 +454,7 @@ class KrozGameLogic:
                     levelloader.objectContainer.FP[grid_y] = ''.join(line)
             
             elif new_pos_value == TELEPORT_PICKUP:
-                self.teleports += 1
-                self.sound_player.play(800, 900, 50)  
+                self.teleports += 1 
                 new_pos_value = NULL  
                 
                 grid_x = new_x - 1  
@@ -469,7 +467,6 @@ class KrozGameLogic:
             elif new_pos_value == GEM_PICKUP:
                 self.gems += 1
                 self.score += 5 
-                self.sound_player.play(600, 700, 50) 
                 new_pos_value = NULL  
                 
                 grid_x = new_x - 1 
@@ -496,11 +493,9 @@ class KrozGameLogic:
 
     def use_whip(self):
         if self.whips < 1:
-            self.sound_player.Nonesound()
             return False
 
         self.whips -= 1
-        self.sound_player.sound(70)
 
         # Check all 8 directions around player and hit what's there
         directions = [
@@ -560,14 +555,11 @@ class KrozGameLogic:
                                 self.fx[i] = None
                                 self.score += 3
                                 break
-
-        self.sound_player.nosound()
         return True
 
     def use_teleport(self):
         """Implements the teleport action from the original game"""
         if self.teleports < 1:
-            self.sound_player.NoneSound()
             return False
 
         self.teleports -= 1
@@ -591,8 +583,7 @@ class KrozGameLogic:
                 self.py = new_y
                 self.pf[new_y][new_x] = PLAYER_ID
                 found_spot = True
-
-        self.sound_player.nosound()
+                
         return True
 
     def use_key(self, x, y):
