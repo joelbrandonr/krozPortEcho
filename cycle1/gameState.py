@@ -22,6 +22,7 @@ MBLOCK_ID = 38
 EWALL = 88
 WHIP_PICKUP = 47
 TELEPORT_PICKUP = 48
+GEM_PICKUP = 49
 
 container = objectContainer.objectContainer()
 levelloader = levelLoader(container)
@@ -420,14 +421,26 @@ class KrozGameLogic:
                 self.sound_player.play(800, 900, 50)  
                 new_pos_value = NULL  
                 
-                grid_x = new_x - 1  # 
+                grid_x = new_x - 1  
                 grid_y = new_y - 1
                 if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
                     line = list(levelloader.objectContainer.FP[grid_y])
                     line[grid_x] = ' ' 
                     levelloader.objectContainer.FP[grid_y] = ''.join(line)
-    
+
+            elif new_pos_value == GEM_PICKUP:
+                self.gems += 1
+                self.score += 5 
+                self.sound_player.play(600, 700, 50) 
+                new_pos_value = NULL  
                 
+                grid_x = new_x - 1 
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' '
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
+
             # Handle replacement like original
             if self.replacement is not None:
                 self.pf[self.py][self.px] = self.replacement
@@ -1213,6 +1226,8 @@ def run_kroz_game(current_level=1, load_save=False):
                 playfield[grid_y][grid_x] = WHIP_PICKUP
             elif char == 'T':  # Teleport pickup
                 playfield[grid_y][grid_x] = TELEPORT_PICKUP
+            elif char == '+':  # Gem pickup
+                playfield[grid_y][grid_x] = GEM_PICKUP
 
 
     # Set the playfield
