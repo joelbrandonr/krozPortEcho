@@ -4,9 +4,10 @@ import numpy as np
 import pygame
 import os
 import pickle
-import levelLoader
+from levelLoader import levelLoader
 import sys 
 import objectContainer
+from screenFunctions import Screen
 
 # constants from original Kroz file
 NULL = 0
@@ -16,7 +17,9 @@ FAST = 3
 WALL = 4
 PLAYER_ID = 40
 MBLOCK_ID = 38
-EWALL = 88
+
+container = objectContainer.objectContainer()
+levelloader = levelLoader(container)
 
 class SoundPlayer:
     def __init__(self):
@@ -150,15 +153,6 @@ class KrozGameLogic:
 
             container_instance = TempContainer()
 
-        try:
-            # Try the standard way first
-            self.level_loader = levelLoader.levelLoader(container_instance)
-            print("Successfully created levelLoader instance")
-        except Exception as e:
-            print(f"Error creating levelLoader: {e}")
-            # If that fails, we'll create a minimal compatible object
-            self.level_loader = None
- 
         # grid dimensions
         self.grid_width = 80  # original game dimensions
         self.grid_height = 25
@@ -1083,30 +1077,11 @@ def run_kroz_game(current_level=1, load_save=False):
     YELLOW = (255, 255, 85)
     WHITE = (255, 255, 255)
 
-    # Level data
-    level_1 = ['W W W W             2 2 2 2 2  C  2 2 2 2 2              W W W W',
-               'XXXXXXXXXXXXXXXXXXX###########   ###########XXXXXXXXXXXXXXXXXXXX',
-               ' 1           1                               1                  ',
-               '                                    1            XX         1   ',
-               '       1            1                           XXXX            ',
-               '#        XX                    +                 XX            #',
-               '##      XXXX  1                +          1          1        ##',
-               'T##      XX               2    +    2                        ##T',
-               'T1##                       W   +   W                        ##1T',
-               'T########X                 WX     XW             1    X########T',
-               '.        X                2WX  P  XW2                 X        .',
-               'T########X         1       WX     XW                  X########T',
-               'T1##                       W   +   W         1              ##1T',
-               'T##                       2    +    2                        ##T',
-               '##   1                         +                      XX      ##',
-               '#       XX      1              +                 1   XXXX     1#',
-               '       XXXX                 ##   ##                   XX        ',
-               '1       XX                 ##     ##     1        1           1 ',
-               '                    1#######       ########                     ',
-               '    1         ########11111  +++++  111111########              ',
-               'WW     ########+++++        #######         WWWWW########1    WW',
-               '########                     2 2 2                     C########',
-               'L2  +  X      #kingdom#of#kroz#ii#by_1#scott#miller#      X + 2L']
+    levelloader.objectContainer.screen = Screen()
+
+    levelloader.Init_Screen()
+    levelloader.Level(1)
+    levelloader.Display_Playfield()
 
     # Create a game instance with a sound player
     sound_player = SoundPlayer()
@@ -1126,10 +1101,6 @@ def run_kroz_game(current_level=1, load_save=False):
             p_x = save_data['player_visual_x']
             p_y = save_data['player_visual_y']
 
-            # Initialize playfield and other data would be here...
-            # This is a simplified version - you'd need to fully restore
-            # the game state from the saved data
-
             print(f"Game loaded! Resuming level {current_level}")
         except Exception as e:
             print(f"Error loading saved game: {e}")
@@ -1137,10 +1108,11 @@ def run_kroz_game(current_level=1, load_save=False):
 
     # Find player position in level
     player_x, player_y = None, None
-    for y, line in enumerate(level_1):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):  # Start from 1
+        line = levelloader.objectContainer.FP[y]  # Access the line using 0-based index
         if 'P' in line:
-            player_x = line.index('P')
-            player_y = y
+            player_x = line.index('P')       # Convert to 1-based index
+            player_y = y                     # Already 1-based
             break
 
     if player_x is None:
@@ -1164,8 +1136,8 @@ def run_kroz_game(current_level=1, load_save=False):
         playfield[y][game.grid_width - 1] = WALL
 
     # Process level data with enemy progression based on current level
-    for y, line in enumerate(level_1):
-        for x, char in enumerate(line):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):
+        for x, char in enumerate(levelloader.objectContainer.FP[y]):
             grid_x = x + 1
             grid_y = y + 1
 
@@ -1458,8 +1430,8 @@ def run_kroz_game(current_level=1, load_save=False):
 
         level_draw_x = 8
         level_draw_y = 16
-        for line in level_1:
-            for element in line:
+        for y in range(1, len(levelloader.objectContainer.FP) - 1):
+            for element in levelloader.objectContainer.FP[y]:
                 # TODO: add proper characters
                 if element == 'X':
                     window.blit(kroz_font.render("²", False, BROWN), (level_draw_x, level_draw_y))
