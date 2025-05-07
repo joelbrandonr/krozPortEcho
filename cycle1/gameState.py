@@ -18,6 +18,11 @@ WALL = 4
 PLAYER_ID = 40
 MBLOCK_ID = 38
 
+# Own constants
+EWALL = 88
+WHIP_PICKUP = 47
+TELEPORT_PICKUP = 48
+
 container = objectContainer.objectContainer()
 levelloader = levelLoader(container)
 
@@ -172,7 +177,7 @@ class KrozGameLogic:
         # Game variables
         self.score = 0
         self.gems = 20
-        self.whips = 100
+        self.whips = 10
         self.teleports = 0
         self.keys = 0
         self.whip_power = 1
@@ -384,7 +389,7 @@ class KrozGameLogic:
 
 
     def move(self, dx, dy):
-        """Direct port of original move procedure"""
+        """Direct port of original move procedure with collectible handling"""
         new_x = self.px + dx
         new_y = self.py + dy
 
@@ -395,25 +400,34 @@ class KrozGameLogic:
 
         new_pos_value = self.pf[new_y][new_x]
 
-        # Check if the player is stepping on an exit tile (L)
-        if new_pos_value == 13:  # ID 13 appears to be the lock/exit tile in your code
-            # Set level complete flag
-            self.level_complete = True
-            
-            # Handle replacement and move player
-            if self.replacement is not None:
-                self.pf[self.py][self.px] = self.replacement
-            else:
-                self.pf[self.py][self.px] = NULL
+        # Original walkable tiles + collectibles
+        if new_pos_value in [NULL, 32, 33, 37, 39, 41, 44, 47, 48, 49, 50]:
+            # Check if this is a collectible
+            if new_pos_value == WHIP_PICKUP:
+                self.whips += 1
+                self.sound_player.play(800, 900, 50)  
+                new_pos_value = NULL  
                 
-            self.px = new_x
-            self.py = new_y
-            self.pf[new_y][new_x] = PLAYER_ID
+                grid_x = new_x - 1  
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' ' 
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
             
-            return True
-
-        # Original walkable tiles
-        if new_pos_value in [NULL, 32, 33, 37, 39, 41, 44, 47]:
+            elif new_pos_value == TELEPORT_PICKUP:
+                self.teleports += 1
+                self.sound_player.play(800, 900, 50)  
+                new_pos_value = NULL  
+                
+                grid_x = new_x - 1  # 
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' ' 
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
+    
+                
             # Handle replacement like original
             if self.replacement is not None:
                 self.pf[self.py][self.px] = self.replacement
@@ -422,7 +436,7 @@ class KrozGameLogic:
 
             self.px = new_x
             self.py = new_y
-            self.replacement = self.pf[new_y][new_x]
+            self.replacement = new_pos_value  # Store the replacement (which might be NULL now for collectibles)
             self.pf[new_y][new_x] = PLAYER_ID
             return True
 
@@ -430,7 +444,6 @@ class KrozGameLogic:
         return False
 
     def use_whip(self):
-        """Implements the whip action that can destroy terrain"""
         if self.whips < 1:
             self.sound_player.Nonesound()
             return False
@@ -440,9 +453,9 @@ class KrozGameLogic:
 
         # Check all 8 directions around player and hit what's there
         directions = [
-            (-1, -1), (-1, 0), (-1, 1),  # Left column
-            (0, -1), (0, 1),  # Middle column (excluding player position)
-            (1, -1), (1, 0), (1, 1)  # Right column
+            (-1, -1), (-1, 0), (-1, 1), 
+            (0, -1), (0, 1), 
+            (1, -1), (1, 0), (1, 1)  
         ]
 
         for dx, dy in directions:
@@ -452,20 +465,32 @@ class KrozGameLogic:
                 # Check what's at this position and handle it
                 target_tile = self.pf[y][x]
                 
-                if target_tile == EWALL:
-                    # Destroy walls
+                if target_tile == EWALL or target_tile == MBLOCK_ID:
+                    # Destroy walls or blocks
                     self.pf[y][x] = NULL
-                elif target_tile == MBLOCK_ID:
-                    # Destroy moving blocks
-                    self.pf[y][x] = NULL
-                    # Remove from block tracking if it was a moving block
-                    for i in range(1, self.b_num + 1):
-                        if self.bx[i] == x and self.by[i] == y:
-                            self.bx[i] = None
-                            break
+                    
+                    # Also update the level data
+                    grid_x = x - 1  # Convert to level data coordinates
+                    grid_y = y - 1
+                    if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                        line = list(levelloader.objectContainer.FP[grid_y])
+                        line[grid_x] = ' '  
+                        levelloader.objectContainer.FP[grid_y] = ''.join(line)
+                    
+                    if target_tile == MBLOCK_ID:
+                        for i in range(1, self.b_num + 1):
+                            if self.bx[i] == x and self.by[i] == y:
+                                self.bx[i] = None
+                                break
                 elif target_tile in [SLOW, MEDIUM, FAST]:
-                    # Keep existing enemy destruction logic
                     self.pf[y][x] = NULL
+                    
+                    grid_x = x - 1
+                    grid_y = y - 1
+                    if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                        line = list(levelloader.objectContainer.FP[grid_y])
+                        line[grid_x] = ' '
+                        levelloader.objectContainer.FP[grid_y] = ''.join(line)
                     if target_tile == SLOW:
                         for i in range(1, self.s_num + 1):
                             if self.sx[i] == x and self.sy[i] == y:
@@ -1162,7 +1187,7 @@ def run_kroz_game(current_level=1, load_save=False):
                     # levels 10+: all enemies are fast
                     playfield[grid_y][grid_x] = FAST
                     game.add_enemy(FAST, grid_x, grid_y, char)
-            elif char == 'W':
+            elif char == "$":
                 if current_level < 15:
                     # level 1-14: wall enemies are normal walls
                     playfield[grid_y][grid_x] = WALL
@@ -1184,6 +1209,11 @@ def run_kroz_game(current_level=1, load_save=False):
                     game.by[game.b_num] = grid_y
             elif char == 'P':
                 player_x, player_y = grid_x, grid_y
+            elif char == 'W':  # Whip pickup
+                playfield[grid_y][grid_x] = WHIP_PICKUP
+            elif char == 'T':  # Teleport pickup
+                playfield[grid_y][grid_x] = TELEPORT_PICKUP
+
 
     # Set the playfield
     game.set_playfield(playfield)
@@ -1412,10 +1442,10 @@ def run_kroz_game(current_level=1, load_save=False):
                         pygame.display.update()
                 pygame.time.delay(100)  
 
-                if keys[pygame.K_t]:  # T for teleport
-                    if game.use_teleport():
-                        p_x = (game.px - 1) * 8 + 8
-                        p_y = (game.py - 1) * 16 + 16
+        if keys[pygame.K_t]:  # T for teleport
+            if game.use_teleport():
+                p_x = (game.px - 1) * 8 + 8
+                p_y = (game.py - 1) * 16 + 16
 
         # Drawing
         window.fill(BLACK)
