@@ -29,34 +29,72 @@ levelloader = levelLoader(container)
 
 class SoundPlayer:
     def __init__(self):
-        """Initialize sound player"""
-        pass
+        pygame.mixer.init()
 
     def sound(self, frequency):
         """Play sound indefinitely."""
-        pass
+        sample_rate = 44100
+        duration = 1.0
+        t = np.linspace(0, duration, int(sample_rate * duration), False)
+        audio_data = 0.5 * np.sin(2 * np.pi * frequency * t)
+        audio_data = (audio_data * 32767).astype(np.int16)
+        # create stereo audio data by duplicating the mono data
+        stereo_audio_data = np.column_stack((audio_data, audio_data))
+        # create a sound object
+        sound = pygame.sndarray.make_sound(stereo_audio_data)
+        sound.play(-1)  # Play indefinitely
 
     def nosound(self):
         """Stop the sound."""
-        pass
+        pygame.mixer.stop()
 
     def delay(self, milliseconds):
-        pass
+        time.sleep(milliseconds / 1000)
 
     def play(self, frequency1, frequency2, delay_length):
-        pass
+        if frequency1 <= frequency2:
+            for x in range(frequency1, frequency2 + 1):
+                self.sound(x)
+                self.delay(delay_length)
+        else:
+            for x in range(frequency1, frequency2 - 1, -1):  # down to frequency2
+                self.sound(x)
+                self.delay(delay_length)
+        self.nosound()
 
     def FootStep(self, FastPC):
-        pass
+        for x in range(1, int(FastPC) * 50 + int(not FastPC) * 23):
+            self.sound(random.randint(0, 550) + 350)
+            self.delay(0.01)  # added delay to compensate for fast CPU
+        self.delay(2);  # Added delay to compensate for fast CPU
+        self.nosound()
+        self.delay(120);
+        for x in range(1, int(FastPC) * 60 + int(not FastPC) * 30):
+            self.sound(random.randint(0, 50) + 150)
+            self.nosound()
 
     def GrabSound(self, FastPC):
-        pass
+        for x in range(1, int(FastPC) * 160 + int(not FastPC) * 65):
+            self.sound(random.randint(0, 1000) + 1000)
+            self.delay(0.01)  # added delay to compensate for fast CPU
+        self.nosound()
 
     def BlockSound(self, FastPC):
-        pass
+        for x in range(60, 30, -1):
+            self.sound(x)
+            self.delay(1 + int(FastPC) * 2)
+        self.nosound()
 
     def NoneSound(self):
-        pass
+        for x in range(1, 5):
+            self.sound(400)
+            self.delay(10)
+            self.nosound()
+            self.delay(10);
+        self.sound(700)
+        self.delay(10)
+        self.nosound()
+        self.delay(10);
 
 # Whip animation
 def animate_whip(window, game, p_x, p_y):
