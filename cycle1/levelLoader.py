@@ -220,7 +220,7 @@ class levelLoader:
         objectContainer.FP[20] = '    1         ########11111  +++++  111111########              '
         objectContainer.FP[21] = 'WW     ########+++++        #######         WWWWW########1    WW'
         objectContainer.FP[22] = '########¯                    2 2 2                     C########'
-        objectContainer.FP[23] = 'L2  +  X      #kingdom#of#kroz#ii#by#scott#miller#      X  +  2L'
+        objectContainer.FP[23] = 'L2  +  X      #kingdom#of#kroz#ii#by#scott#miller#      X  +  L2' 
         objectContainer.Fast = chr(234)
         self.Convert_Format()
     

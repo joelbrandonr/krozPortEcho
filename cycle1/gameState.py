@@ -16,76 +16,109 @@ FAST = 3
 WALL = 4
 PLAYER_ID = 40
 MBLOCK_ID = 38
-
+EWALL = 88
 
 class SoundPlayer:
     def __init__(self):
-        pygame.mixer.init()
+        """Initialize sound player"""
+        pass
 
     def sound(self, frequency):
         """Play sound indefinitely."""
-        sample_rate = 44100
-        duration = 1.0
-        t = np.linspace(0, duration, int(sample_rate * duration), False)
-        audio_data = 0.5 * np.sin(2 * np.pi * frequency * t)
-        audio_data = (audio_data * 32767).astype(np.int16)
-        # create stereo audio data by duplicating the mono data
-        stereo_audio_data = np.column_stack((audio_data, audio_data))
-        # create a sound object
-        sound = pygame.sndarray.make_sound(stereo_audio_data)
-        sound.play(-1)  # Play indefinitely
+        pass
 
     def nosound(self):
         """Stop the sound."""
-        pygame.mixer.stop()
+        pass
 
     def delay(self, milliseconds):
-        time.sleep(milliseconds / 1000)
+        pass
 
     def play(self, frequency1, frequency2, delay_length):
-        if frequency1 <= frequency2:
-            for x in range(frequency1, frequency2 + 1):
-                self.sound(x)
-                self.delay(delay_length)
-        else:
-            for x in range(frequency1, frequency2 - 1, -1):  # down to frequency2
-                self.sound(x)
-                self.delay(delay_length)
-        self.nosound()
+        pass
 
     def FootStep(self, FastPC):
-        for x in range(1, int(FastPC) * 50 + int(not FastPC) * 23):
-            self.sound(random.randint(0, 550) + 350)
-            self.delay(0.01)  # added delay to compensate for fast CPU
-        self.delay(2);  # Added delay to compensate for fast CPU
-        self.nosound()
-        self.delay(120);
-        for x in range(1, int(FastPC) * 60 + int(not FastPC) * 30):
-            self.sound(random.randint(0, 50) + 150)
-            self.nosound()
+        pass
 
     def GrabSound(self, FastPC):
-        for x in range(1, int(FastPC) * 160 + int(not FastPC) * 65):
-            self.sound(random.randint(0, 1000) + 1000)
-            self.delay(0.01)  # added delay to compensate for fast CPU
-        self.nosound()
+        pass
 
     def BlockSound(self, FastPC):
-        for x in range(60, 30, -1):
-            self.sound(x)
-            self.delay(1 + int(FastPC) * 2)
-        self.nosound()
+        pass
 
     def NoneSound(self):
-        for x in range(1, 5):
-            self.sound(400)
-            self.delay(10)
-            self.nosound()
-            self.delay(10);
-        self.sound(700)
-        self.delay(10)
-        self.nosound()
-        self.delay(10);
+        pass
+
+# Whip animation
+def animate_whip(window, game, p_x, p_y):
+    # Direction-based characters
+    direction_chars = {
+        (0, -1): '|',  
+        (1, -1): '/',  
+        (1, 0): '-',   
+        (1, 1): '\\',   
+        (0, 1): '|',    
+        (-1, 1): '/',   
+        (-1, 0): '-',   
+        (-1, -1): '\\' 
+    }
+    
+    # Directions for the whip animation
+    directions = [
+        (0, -1),   
+        (1, -1),  
+        (1, 0),  
+        (1, 1),   
+        (0, 1),   
+        (-1, 1),  
+        (-1, 0),  
+        (-1, -1)   
+    ]
+    
+    tile_width = 8
+    tile_height = 16
+
+    whip_color = (255, 255, 255) 
+    
+    screen_copy = window.copy()
+    
+    # Track and clear last known pos
+    last_pos = None
+    
+    # Draw each character in circular sequence
+    for dx, dy in directions:
+        # Calculate position
+        whip_x = p_x + (dx * tile_width)
+        whip_y = p_y + (dy * tile_height)
+        
+        # Clear the previous position by restoring from screen_copy
+        if last_pos:
+            # Get the rect for the last position
+            last_rect = pygame.Rect(last_pos[0], last_pos[1], tile_width, tile_height)
+            window.blit(screen_copy, last_rect, last_rect)
+            pygame.display.update(last_rect)
+        
+        # Draw the appropriate character for this direction
+        char = direction_chars[(dx, dy)]
+        font = pygame.font.SysFont('Arial', 16)
+        text = font.render(char, True, whip_color)
+        window.blit(text, (whip_x, whip_y))
+        
+        # Update only the specific part of the display
+        pygame.display.update(pygame.Rect(whip_x, whip_y, tile_width, tile_height))
+        
+        last_pos = (whip_x, whip_y)
+        
+        pygame.time.delay(20)
+
+    for dx, dy in directions:
+        whip_x = p_x + (dx * tile_width)
+        whip_y = p_y + (dy * tile_height)
+        rect = pygame.Rect(whip_x, whip_y, tile_width, tile_height)
+        window.blit(screen_copy, rect, rect)
+
+    pygame.display.update()
+    del screen_copy
 
 
 class KrozGameLogic:
@@ -145,7 +178,7 @@ class KrozGameLogic:
         # Game variables
         self.score = 0
         self.gems = 20
-        self.whips = 10
+        self.whips = 100
         self.teleports = 0
         self.keys = 0
         self.whip_power = 1
@@ -368,6 +401,23 @@ class KrozGameLogic:
 
         new_pos_value = self.pf[new_y][new_x]
 
+        # Check if the player is stepping on an exit tile (L)
+        if new_pos_value == 13:  # ID 13 appears to be the lock/exit tile in your code
+            # Set level complete flag
+            self.level_complete = True
+            
+            # Handle replacement and move player
+            if self.replacement is not None:
+                self.pf[self.py][self.px] = self.replacement
+            else:
+                self.pf[self.py][self.px] = NULL
+                
+            self.px = new_x
+            self.py = new_y
+            self.pf[new_y][new_x] = PLAYER_ID
+            
+            return True
+
         # Original walkable tiles
         if new_pos_value in [NULL, 32, 33, 37, 39, 41, 44, 47]:
             # Handle replacement like original
@@ -386,7 +436,7 @@ class KrozGameLogic:
         return False
 
     def use_whip(self):
-        """Implements the whip action from the original game"""
+        """Implements the whip action that can destroy terrain"""
         if self.whips < 1:
             self.sound_player.Nonesound()
             return False
@@ -395,7 +445,6 @@ class KrozGameLogic:
         self.sound_player.sound(70)
 
         # Check all 8 directions around player and hit what's there
-        # The original hit() function would check the tile type and do damage
         directions = [
             (-1, -1), (-1, 0), (-1, 1),  # Left column
             (0, -1), (0, 1),  # Middle column (excluding player position)
@@ -407,23 +456,35 @@ class KrozGameLogic:
             # check bounds
             if 0 <= x < self.grid_width and 0 <= y < self.grid_height:
                 # Check what's at this position and handle it
-                if self.pf[y][x] in [SLOW, MEDIUM, FAST]:
-                    # Clear the enemy at this position
+                target_tile = self.pf[y][x]
+                
+                if target_tile == EWALL:
+                    # Destroy walls
                     self.pf[y][x] = NULL
-                    # Find and remove the enemy from the tracking arrays
-                    if self.pf[y][x] == SLOW:
+                elif target_tile == MBLOCK_ID:
+                    # Destroy moving blocks
+                    self.pf[y][x] = NULL
+                    # Remove from block tracking if it was a moving block
+                    for i in range(1, self.b_num + 1):
+                        if self.bx[i] == x and self.by[i] == y:
+                            self.bx[i] = None
+                            break
+                elif target_tile in [SLOW, MEDIUM, FAST]:
+                    # Keep existing enemy destruction logic
+                    self.pf[y][x] = NULL
+                    if target_tile == SLOW:
                         for i in range(1, self.s_num + 1):
                             if self.sx[i] == x and self.sy[i] == y:
                                 self.sx[i] = None
                                 self.score += 1
                                 break
-                    elif self.pf[y][x] == MEDIUM:
+                    elif target_tile == MEDIUM:
                         for i in range(1, self.m_num + 1):
                             if self.mx[i] == x and self.my[i] == y:
                                 self.mx[i] = None
                                 self.score += 2
                                 break
-                    elif self.pf[y][x] == FAST:
+                    elif target_tile == FAST:
                         for i in range(1, self.f_num + 1):
                             if self.fx[i] == x and self.fy[i] == y:
                                 self.fx[i] = None
@@ -1045,7 +1106,7 @@ def run_kroz_game(current_level=1, load_save=False):
                '    1         ########11111  +++++  111111########              ',
                'WW     ########+++++        #######         WWWWW########1    WW',
                '########                     2 2 2                     C########',
-               'L2  +  X      #kingdom#of#kroz#ii#by_1#scott#miller#      X  +  2L']
+               'L2  +  X      #kingdom#of#kroz#ii#by_1#scott#miller#      X + 2L']
 
     # Create a game instance with a sound player
     sound_player = SoundPlayer()
@@ -1373,13 +1434,16 @@ def run_kroz_game(current_level=1, load_save=False):
             pygame.time.delay(1000)
 
         if keys[pygame.K_w]:  # W for whip
-            if game.use_whip():
-                pass
+            if game.whips > 0:  # Check if whips are available
+                if game.use_whip():
+                        animate_whip(window,game, p_x, p_y)
+                        pygame.display.update()
+                pygame.time.delay(100)  
 
-        if keys[pygame.K_t]:  # T for teleport
-            if game.use_teleport():
-                p_x = (game.px - 1) * 8 + 8
-                p_y = (game.py - 1) * 16 + 16
+                if keys[pygame.K_t]:  # T for teleport
+                    if game.use_teleport():
+                        p_x = (game.px - 1) * 8 + 8
+                        p_y = (game.py - 1) * 16 + 16
 
         # Drawing
         window.fill(BLACK)
@@ -1401,6 +1465,8 @@ def run_kroz_game(current_level=1, load_save=False):
                     window.blit(kroz_font.render("²", False, BROWN), (level_draw_x, level_draw_y))
                 if element == 'W':
                     window.blit(kroz_font.render("ô", False, WHITE), (level_draw_x, level_draw_y))
+                if element == 'E':
+                    window.blit(kroz_font.render("±", False, LIGHT_RED), (level_draw_x, level_draw_y))
                 if element == 'L':
                     pygame.draw.rect(window, LIGHT_GRAY, (level_draw_x, level_draw_y, 8, 16))
                     window.blit(kroz_font.render("ð", False, BLACK), (level_draw_x, level_draw_y))
