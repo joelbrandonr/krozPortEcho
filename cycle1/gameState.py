@@ -4,9 +4,10 @@ import numpy as np
 import pygame
 import os
 import pickle
-import levelLoader
+from levelLoader import levelLoader
 import sys 
 import objectContainer
+from screenFunctions import Screen
 
 # constants from original Kroz file
 NULL = 0
@@ -17,6 +18,14 @@ WALL = 4
 PLAYER_ID = 40
 MBLOCK_ID = 38
 
+# Own constants
+EWALL = 88
+WHIP_PICKUP = 47
+TELEPORT_PICKUP = 48
+GEM_PICKUP = 49
+
+container = objectContainer.objectContainer()
+levelloader = levelLoader(container)
 
 class SoundPlayer:
     def __init__(self):
@@ -87,6 +96,77 @@ class SoundPlayer:
         self.nosound()
         self.delay(10);
 
+# Whip animation
+def animate_whip(window, game, p_x, p_y):
+    # Direction-based characters
+    direction_chars = {
+        (0, -1): '|',  
+        (1, -1): '/',  
+        (1, 0): '-',   
+        (1, 1): '\\',   
+        (0, 1): '|',    
+        (-1, 1): '/',   
+        (-1, 0): '-',   
+        (-1, -1): '\\' 
+    }
+    
+    # Directions for the whip animation
+    directions = [
+        (0, -1),   
+        (1, -1),  
+        (1, 0),  
+        (1, 1),   
+        (0, 1),   
+        (-1, 1),  
+        (-1, 0),  
+        (-1, -1)   
+    ]
+    
+    tile_width = 8
+    tile_height = 16
+
+    whip_color = (255, 255, 255) 
+    
+    screen_copy = window.copy()
+    
+    # Track and clear last known pos
+    last_pos = None
+    
+    # Draw each character in circular sequence
+    for dx, dy in directions:
+        # Calculate position
+        whip_x = p_x + (dx * tile_width)
+        whip_y = p_y + (dy * tile_height)
+        
+        # Clear the previous position by restoring from screen_copy
+        if last_pos:
+            # Get the rect for the last position
+            last_rect = pygame.Rect(last_pos[0], last_pos[1], tile_width, tile_height)
+            window.blit(screen_copy, last_rect, last_rect)
+            pygame.display.update(last_rect)
+        
+        # Draw the appropriate character for this direction
+        char = direction_chars[(dx, dy)]
+        font = pygame.font.SysFont('Arial', 16)
+        text = font.render(char, True, whip_color)
+        window.blit(text, (whip_x, whip_y))
+        
+        # Update only the specific part of the display
+        pygame.display.update(pygame.Rect(whip_x, whip_y, tile_width, tile_height))
+        
+        last_pos = (whip_x, whip_y)
+        
+        pygame.time.delay(20)
+
+    for dx, dy in directions:
+        whip_x = p_x + (dx * tile_width)
+        whip_y = p_y + (dy * tile_height)
+        rect = pygame.Rect(whip_x, whip_y, tile_width, tile_height)
+        window.blit(screen_copy, rect, rect)
+
+    pygame.display.update()
+    del screen_copy
+
 
 class KrozGameLogic:
     def __init__(self, sound_player=None, playfield=None):
@@ -117,15 +197,6 @@ class KrozGameLogic:
 
             container_instance = TempContainer()
 
-        try:
-            # Try the standard way first
-            self.level_loader = levelLoader.levelLoader(container_instance)
-            print("Successfully created levelLoader instance")
-        except Exception as e:
-            print(f"Error creating levelLoader: {e}")
-            # If that fails, we'll create a minimal compatible object
-            self.level_loader = None
- 
         # grid dimensions
         self.grid_width = 80  # original game dimensions
         self.grid_height = 25
@@ -357,7 +428,7 @@ class KrozGameLogic:
 
 
     def move(self, dx, dy):
-        """Direct port of original move procedure"""
+        """Direct port of original move procedure with collectible handling"""
         new_x = self.px + dx
         new_y = self.py + dy
 
@@ -368,8 +439,46 @@ class KrozGameLogic:
 
         new_pos_value = self.pf[new_y][new_x]
 
-        # Original walkable tiles
-        if new_pos_value in [NULL, 32, 33, 37, 39, 41, 44, 47]:
+        # Original walkable tiles + collectibles
+        if new_pos_value in [NULL, 32, 33, 37, 39, 41, 44, 47, 48, 49, 50]:
+            # Check if this is a collectible
+            if new_pos_value == WHIP_PICKUP:
+                self.whips += 1
+                self.sound_player.play(800, 900, 50)  
+                new_pos_value = NULL  
+                
+                grid_x = new_x - 1  
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' ' 
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
+            
+            elif new_pos_value == TELEPORT_PICKUP:
+                self.teleports += 1
+                self.sound_player.play(800, 900, 50)  
+                new_pos_value = NULL  
+                
+                grid_x = new_x - 1  
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' ' 
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
+
+            elif new_pos_value == GEM_PICKUP:
+                self.gems += 1
+                self.score += 5 
+                self.sound_player.play(600, 700, 50) 
+                new_pos_value = NULL  
+                
+                grid_x = new_x - 1 
+                grid_y = new_y - 1
+                if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                    line = list(levelloader.objectContainer.FP[grid_y])
+                    line[grid_x] = ' '
+                    levelloader.objectContainer.FP[grid_y] = ''.join(line)
+
             # Handle replacement like original
             if self.replacement is not None:
                 self.pf[self.py][self.px] = self.replacement
@@ -378,7 +487,7 @@ class KrozGameLogic:
 
             self.px = new_x
             self.py = new_y
-            self.replacement = self.pf[new_y][new_x]
+            self.replacement = new_pos_value  # Store the replacement (which might be NULL now for collectibles)
             self.pf[new_y][new_x] = PLAYER_ID
             return True
 
@@ -386,7 +495,6 @@ class KrozGameLogic:
         return False
 
     def use_whip(self):
-        """Implements the whip action from the original game"""
         if self.whips < 1:
             self.sound_player.Nonesound()
             return False
@@ -395,11 +503,10 @@ class KrozGameLogic:
         self.sound_player.sound(70)
 
         # Check all 8 directions around player and hit what's there
-        # The original hit() function would check the tile type and do damage
         directions = [
-            (-1, -1), (-1, 0), (-1, 1),  # Left column
-            (0, -1), (0, 1),  # Middle column (excluding player position)
-            (1, -1), (1, 0), (1, 1)  # Right column
+            (-1, -1), (-1, 0), (-1, 1), 
+            (0, -1), (0, 1), 
+            (1, -1), (1, 0), (1, 1)  
         ]
 
         for dx, dy in directions:
@@ -407,23 +514,47 @@ class KrozGameLogic:
             # check bounds
             if 0 <= x < self.grid_width and 0 <= y < self.grid_height:
                 # Check what's at this position and handle it
-                if self.pf[y][x] in [SLOW, MEDIUM, FAST]:
-                    # Clear the enemy at this position
+                target_tile = self.pf[y][x]
+                
+                if target_tile == EWALL or target_tile == MBLOCK_ID:
+                    # Destroy walls or blocks
                     self.pf[y][x] = NULL
-                    # Find and remove the enemy from the tracking arrays
-                    if self.pf[y][x] == SLOW:
+                    
+                    # Also update the level data
+                    grid_x = x - 1  # Convert to level data coordinates
+                    grid_y = y - 1
+                    if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                        line = list(levelloader.objectContainer.FP[grid_y])
+                        line[grid_x] = ' '  
+                        levelloader.objectContainer.FP[grid_y] = ''.join(line)
+                    
+                    if target_tile == MBLOCK_ID:
+                        for i in range(1, self.b_num + 1):
+                            if self.bx[i] == x and self.by[i] == y:
+                                self.bx[i] = None
+                                break
+                elif target_tile in [SLOW, MEDIUM, FAST]:
+                    self.pf[y][x] = NULL
+                    
+                    grid_x = x - 1
+                    grid_y = y - 1
+                    if 0 <= grid_y < len(levelloader.objectContainer.FP) and grid_x < len(levelloader.objectContainer.FP[grid_y]):
+                        line = list(levelloader.objectContainer.FP[grid_y])
+                        line[grid_x] = ' '
+                        levelloader.objectContainer.FP[grid_y] = ''.join(line)
+                    if target_tile == SLOW:
                         for i in range(1, self.s_num + 1):
                             if self.sx[i] == x and self.sy[i] == y:
                                 self.sx[i] = None
                                 self.score += 1
                                 break
-                    elif self.pf[y][x] == MEDIUM:
+                    elif target_tile == MEDIUM:
                         for i in range(1, self.m_num + 1):
                             if self.mx[i] == x and self.my[i] == y:
                                 self.mx[i] = None
                                 self.score += 2
                                 break
-                    elif self.pf[y][x] == FAST:
+                    elif target_tile == FAST:
                         for i in range(1, self.f_num + 1):
                             if self.fx[i] == x and self.fy[i] == y:
                                 self.fx[i] = None
@@ -1022,30 +1153,11 @@ def run_kroz_game(current_level=1, load_save=False):
     YELLOW = (255, 255, 85)
     WHITE = (255, 255, 255)
 
-    # Level data
-    level_1 = ['W W W W             2 2 2 2 2  C  2 2 2 2 2              W W W W',
-               'XXXXXXXXXXXXXXXXXXX###########   ###########XXXXXXXXXXXXXXXXXXXX',
-               ' 1           1                               1                  ',
-               '                                    1            XX         1   ',
-               '       1            1                           XXXX            ',
-               '#        XX                    +                 XX            #',
-               '##      XXXX  1                +          1          1        ##',
-               'T##      XX               2    +    2                        ##T',
-               'T1##                       W   +   W                        ##1T',
-               'T########X                 WX     XW             1    X########T',
-               '.        X                2WX  P  XW2                 X        .',
-               'T########X         1       WX     XW                  X########T',
-               'T1##                       W   +   W         1              ##1T',
-               'T##                       2    +    2                        ##T',
-               '##   1                         +                      XX      ##',
-               '#       XX      1              +                 1   XXXX     1#',
-               '       XXXX                 ##   ##                   XX        ',
-               '1       XX                 ##     ##     1        1           1 ',
-               '                    1#######       ########                     ',
-               '    1         ########11111  +++++  111111########              ',
-               'WW     ########+++++        #######         WWWWW########1    WW',
-               '########                     2 2 2                     C########',
-               'L2  +  X      #kingdom#of#kroz#ii#by_1#scott#miller#      X  +  2L']
+    levelloader.objectContainer.screen = Screen()
+
+    levelloader.Init_Screen()
+    levelloader.Level(1)
+    levelloader.Display_Playfield()
 
     # Create a game instance with a sound player
     sound_player = SoundPlayer()
@@ -1065,10 +1177,6 @@ def run_kroz_game(current_level=1, load_save=False):
             p_x = save_data['player_visual_x']
             p_y = save_data['player_visual_y']
 
-            # Initialize playfield and other data would be here...
-            # This is a simplified version - you'd need to fully restore
-            # the game state from the saved data
-
             print(f"Game loaded! Resuming level {current_level}")
         except Exception as e:
             print(f"Error loading saved game: {e}")
@@ -1076,10 +1184,11 @@ def run_kroz_game(current_level=1, load_save=False):
 
     # Find player position in level
     player_x, player_y = None, None
-    for y, line in enumerate(level_1):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):  # Start from 1
+        line = levelloader.objectContainer.FP[y]  # Access the line using 0-based index
         if 'P' in line:
-            player_x = line.index('P')
-            player_y = y
+            player_x = line.index('P')       # Convert to 1-based index
+            player_y = y                     # Already 1-based
             break
 
     if player_x is None:
@@ -1103,8 +1212,8 @@ def run_kroz_game(current_level=1, load_save=False):
         playfield[y][game.grid_width - 1] = WALL
 
     # Process level data with enemy progression based on current level
-    for y, line in enumerate(level_1):
-        for x, char in enumerate(line):
+    for y in range(1, len(levelloader.objectContainer.FP) - 1):
+        for x, char in enumerate(levelloader.objectContainer.FP[y]):
             grid_x = x + 1
             grid_y = y + 1
 
@@ -1129,7 +1238,7 @@ def run_kroz_game(current_level=1, load_save=False):
                     # levels 10+: all enemies are fast
                     playfield[grid_y][grid_x] = FAST
                     game.add_enemy(FAST, grid_x, grid_y, char)
-            elif char == 'W':
+            elif char == "$":
                 if current_level < 15:
                     # level 1-14: wall enemies are normal walls
                     playfield[grid_y][grid_x] = WALL
@@ -1151,6 +1260,13 @@ def run_kroz_game(current_level=1, load_save=False):
                     game.by[game.b_num] = grid_y
             elif char == 'P':
                 player_x, player_y = grid_x, grid_y
+            elif char == 'W':  # Whip pickup
+                playfield[grid_y][grid_x] = WHIP_PICKUP
+            elif char == 'T':  # Teleport pickup
+                playfield[grid_y][grid_x] = TELEPORT_PICKUP
+            elif char == '+':  # Gem pickup
+                playfield[grid_y][grid_x] = GEM_PICKUP
+
 
     # Set the playfield
     game.set_playfield(playfield)
@@ -1373,8 +1489,11 @@ def run_kroz_game(current_level=1, load_save=False):
             pygame.time.delay(1000)
 
         if keys[pygame.K_w]:  # W for whip
-            if game.use_whip():
-                pass
+            if game.whips > 0:  # Check if whips are available
+                if game.use_whip():
+                        animate_whip(window,game, p_x, p_y)
+                        pygame.display.update()
+                pygame.time.delay(100)  
 
         if keys[pygame.K_t]:  # T for teleport
             if game.use_teleport():
@@ -1394,13 +1513,15 @@ def run_kroz_game(current_level=1, load_save=False):
 
         level_draw_x = 8
         level_draw_y = 16
-        for line in level_1:
-            for element in line:
+        for y in range(1, len(levelloader.objectContainer.FP) - 1):
+            for element in levelloader.objectContainer.FP[y]:
                 # TODO: add proper characters
                 if element == 'X':
                     window.blit(kroz_font.render("²", False, BROWN), (level_draw_x, level_draw_y))
                 if element == 'W':
                     window.blit(kroz_font.render("ô", False, WHITE), (level_draw_x, level_draw_y))
+                if element == 'E':
+                    window.blit(kroz_font.render("±", False, LIGHT_RED), (level_draw_x, level_draw_y))
                 if element == 'L':
                     pygame.draw.rect(window, LIGHT_GRAY, (level_draw_x, level_draw_y, 8, 16))
                     window.blit(kroz_font.render("ð", False, BLACK), (level_draw_x, level_draw_y))
